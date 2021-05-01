@@ -83,6 +83,12 @@ export default class MainScene extends Phaser.Scene {
                 State.plants[i] = (State.plants[i] + 1) % 6;
             
             });
+            plot.on(Phaser.Input.Events.POINTER_OVER, () => {
+                plot.setTint(0x00ff00);
+            });
+            plot.on(Phaser.Input.Events.POINTER_OUT, () => {
+                plot.clearTint();
+            });
             const plant = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.Plant1);
             plant.setScale(0.075);
             this.plants.push(plant);
