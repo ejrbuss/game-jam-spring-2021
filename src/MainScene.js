@@ -11,6 +11,12 @@ export default class MainScene extends Phaser.Scene {
     super() {
         constructor('MainScene');
     }
+
+    gotoPhase(phase) {
+        this.events.emit(Constants.Events.ExitPhase);
+        State.phase = phase;
+        this.events.emit(Constants.Events.EnterPhase);
+    }
     
     preload() {
         for (const key in Assets.Images) {
@@ -25,18 +31,35 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-
-        this.farmBackground = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
+        const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
 
         // Start screen
-        this.startButton = this.createButton(Constants.Width / 2, Constants.Height / 2, Assets.Images.StartButton, () => { State.state = 'market' });
-
-        // End screen
+        const startButton = this.createButton(
+            Constants.Width / 2, 
+            Constants.Height / 2, 
+            Assets.Images.StartButton, 
+            () => { 
+                this.gotoPhase(Constants.Phases.Market) 
+            });
+        this.visibleDuringPhase(Constants.Phases.Start, startButton);
 
         // Market
-        this.marketObjects = [];
-        this.marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
-        this.marketObjects.push(this.marketBoard);
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase !== Constants.Phases.Market) { return; }
+            // Reset players hand
+            State.hand = [
+                Cards.CardSeed,
+                [
+                    Cards.CardPestilence,
+                    Cards.CardPlague,
+                    Cards.CardDrought,
+                ][Phaser.Math.Between(0, 2)],
+            ];
+            // Tell market cards to refresh
+            this.events.emit(Constants.Events.RefreshMarket);
+        });
+        const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
+        this.visibleDuringPhase(Constants.Phases.Market, marketBoard);
 
         this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 50, Cards.CardCow);
         this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 50, Cards.CardScarecrow);
@@ -44,12 +67,7 @@ export default class MainScene extends Phaser.Scene {
         this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 250, Cards.CardOveralls);
         this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 250, Cards.CardSprinkler);
         this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 250, Cards.CardTractor);
-
         this.createMarketCard(Constants.Width / 4 + 450, Constants.Height / 4 + 50, Cards.CardSeed, true);
-
-        for (const object of this.marketObjects) {
-            object.setVisible(false);
-        }
 
         // Farm plots
         this.farmPlots = [];
@@ -77,6 +95,16 @@ export default class MainScene extends Phaser.Scene {
         for (const key in Cards) {
             this.createHandCard(Cards[key]);
         }
+
+        this.gotoPhase(Constants.Phases.Start);
+    }
+
+    visibleDuringPhase(phase, ...objects) {
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            for (const object of objects) {
+                object.setVisible(State.phase === phase);
+            }
+        });
     }
 
     createButton(x, y, buttonAsset, onClick) {
@@ -100,38 +128,45 @@ export default class MainScene extends Phaser.Scene {
         return button;
     }
 
-    createMarketCard(x, y, card, upgradeOnly = false) {
+
+    createMarketCard(x, y, card) {
         // TODO upgrade and buy buttons should be in a visibly disabled state if 
         // the player cannot afford them
+        const rotation = Phaser.Math.Between(-100, 100) / 500;
         const marketCard = this.add.sprite(x, y, card.Image);
-        marketCard.setRotation(Phaser.Math.Between(-100, 100) / 500);
-        if (upgradeOnly) {
-            const upgradeButton = this.createButton(x, y + 100, Assets.Images.UpgradeButton, () => {});
-            this.marketObjects.push(marketCard, upgradeButton);
-        } else {
-            const upgradeButton = this.createButton(x - 30, y + 100, Assets.Images.UpgradeButton, () => {
-                upgradeButton.setVisible(false);
-            });
-            const buyButton = this.createButton(x + 30, y + 100, Assets.Images.BuyButton, () => { 
-                // TODO subtract player cash and update the other buy/upgrade states
-                State.hand.push(card);
-                // TODO create a prettier indication that the card has been bought
-                // Eg. a SOLD sign over the card
-                marketCard.setTint(0xff0000);
-                buyButton.setVisible(false);
-                if (State.hand.length === 5) {
-                    State.state = 'farm';
-                }
-            });
-            this.marketObjects.push(marketCard, upgradeButton, buyButton);
-        }
+        marketCard.setRotation(rotation);
+        const levelIndicator = this.add.text(x - 30, y - 55, '');
+        levelIndicator.setColor('#000000');
+        const upgradeButton = this.createButton(x - 30, y + 100, Assets.Images.UpgradeButton, () => {
+            State.cardLevels[card.Key] += 1;
+            this.events.emit(Constants.Events.RefreshMarket);
+        });
+        const buyButton = this.createButton(x + 30, y + 100, Assets.Images.BuyButton, () => { 
+            // TODO subtract player cash and update the other buy/upgrade states
+            State.hand.push(card);
+            // TODO create a prettier indication that the card has been bought
+            // Eg. a SOLD sign over the card
+            marketCard.setTint(0xff0000);
+            buyButton.setVisible(false);
+            if (State.hand.length === 5) {
+                this.gotoPhase(Constants.Phases.Farm);
+            }
+        });
+        this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton, buyButton);
+        this.events.addListener(Constants.Events.RefreshMarket, () => {
+            // TODO show the card level in a proper manner
+            levelIndicator.setText(`Level ${State.cardLevels[card.Key] + 1}`);
+            // Show buy button if card is not in hand
 
+            // Show upgrade button if card has a higher level
+
+            
+        });
     }
 
     createHandCard(card) {
         const handCard = this.add.sprite(0, Constants.Height + 25, card.Image);
         handCard.setInteractive();
-        handCard.setVisible(false);
         handCard.on(Phaser.Input.Events.POINTER_OVER, () => {
             // TODO animate the card falling
             handCard.setY(Constants.Height - 75);
@@ -144,100 +179,10 @@ export default class MainScene extends Phaser.Scene {
     }
 
     update() {
-        const entering = State.state;
-        const exiting = this.lastState;
-
-        if (entering !== exiting) {
-            switch (exiting) {
-                case 'start': {
-                    this.startButton.setVisible(false);
-                    break;
-                }
-                case 'end': {
-                    break;
-                }
-                case 'market': {
-                    for (const object of this.marketObjects) {
-                        object.setVisible(false);
-                    }
-                    break;
-                }
-                case 'farm': {
-                    for (const plot of this.farmPlots) {
-                        plot.setVisible(false);
-                    }
-                    for (const plotHitBox of this.plotHitBoxes) {
-                        plotHitBox.setVisible(false);
-                    }
-                    break;
-                }
-            }
-            switch (entering) {
-                case 'start': {
-                    // TODO animate fade-in (from black or white?)
-                    this.startButton.setVisible(true);
-                    break;
-                }
-                case 'end': {
-                    break;
-                }
-                case 'market': {
-                    // TODO Reset hand to seed + random curse
-                    State.hand = [ Cards.CardSeed, [
-                        Cards.CardDrought,
-                        Cards.CardPestilence,
-                        Cards.CardPlague,
-                    ][Phaser.Math.Between(0, 2)] ];
-                    // TODO animate marketBackground dropping down
-                    // TODO animate blur of farm background
-                    for (const object of this.marketObjects) {
-                        object.setVisible(true);
-                    }
-                    break;
-                }
-                case 'farm': {
-                    for (const plotHitBox of this.plotHitBoxes) {
-                        plotHitBox.setVisible(true);
-                    }
-                    for (const plot of this.farmPlots) {
-                        plot.setVisible(true);
-                    }
-                    setTimeout(() => State.state = 'market', Constants.FarmingTime);
-                    break;
-                }
-            }
-
-        }
-        switch (State.state) {
-            case 'start': {
-                this.updateHand(false);
-                break;
-            }
-            case 'end': {
-                this.updateHand(false);
-                break;
-            }
-            case 'market': {
-                this.updateHand(true);
-                break;
-            }
-            case 'farm': {
-                this.updateHand(true);
-                for (const i in this.farmPlots) {
-                    const plot = this.farmPlots[i];
-                    plot.setTexture(Assets.Images['Plant' + State.plots[i]]);
-                }
-                break;
-            }
-        }
-        this.lastState = State.state;
-    }
-
-    updateHand(show = true) {
         for (const object in this.handCards) {
             this.handCards[object].setVisible(false);
         }
-        if (show) {
+        if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
             let offset = 60;
             for (const card of State.hand) {
                 const handCard = this.handCards[card.Key];
@@ -245,6 +190,10 @@ export default class MainScene extends Phaser.Scene {
                 handCard.setX(offset);
                 offset += 110;
             }
+        }
+        for (const i in this.farmPlots) {
+            const plot = this.farmPlots[i];
+            plot.setTexture(Assets.Images['Plant' + State.plots[i]]);
         }
     }
 

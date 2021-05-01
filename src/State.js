@@ -1,9 +1,7 @@
-import Cards from "./Cards";
-
 // This is the game's entire mutable state, and its initial value
 const State = {
     // start, market, farm, end
-    state: "start",
+    phase: undefined,
     // Player's current hand
     hand: [],
     season: 0,
@@ -20,7 +18,7 @@ const State = {
     // Player's current monies
     playerCash: 0,
     // Current card levels
-    cardLevees: {
+    cardLevels: {
         CardSeed: 0,
         CardCow: 0,
         CardScarecrow: 0,
