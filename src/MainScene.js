@@ -4,8 +4,6 @@ import Cards from './Cards';
 import Constants from './Constants';
 import State from './State'; 
 
-console.log(Assets);
-
 export default class MainScene extends Phaser.Scene {
 
     super() {
@@ -56,7 +54,8 @@ export default class MainScene extends Phaser.Scene {
                 ][Phaser.Math.Between(0, 2)],
             ];
             // Tell market cards to refresh
-            this.events.emit(Constants.Events.RefreshMarket);
+            setTimeout(() => this.events.emit(Constants.Events.RefreshMarket));
+
         });
         const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
         this.visibleDuringPhase(Constants.Phases.Market, marketBoard);
@@ -70,25 +69,31 @@ export default class MainScene extends Phaser.Scene {
         this.createMarketCard(Constants.Width / 4 + 450, Constants.Height / 4 + 50, Cards.CardSeed, true);
 
         // Farm plots
-        this.farmPlots = [];
-        this.plotHitBoxes = [];
-        for (let i = 0; i < State.plots.length; i++) {
+        this.plants= [];
+        this.plots = [];
+        for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
-            const plot = this.add.sprite(x * 75 + 175, y * 75 + 25, Assets.Images.Plant0);
-            plot.setVisible(false);
-            const plotHitBox = this.add.rectangle(x * 75 + 175, y * 75 + 100, 75, 75, 0x0, 0);
-            plotHitBox.setInteractive();
-            plotHitBox.setStrokeStyle(1, 0x0000ff);
-            plotHitBox.setVisible(false);
-            plotHitBox.on(Phaser.Input.Events.POINTER_DOWN, () => {
+            const plot = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.Plot);
+            plot.setScale(0.075);
+            plot.setInteractive();
+            plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
                 // TODO manage plot state properly
                 console.log('clicked plot');
-                State.plots[i] = (State.plots[i] + 1) % 3;
+                State.plants[i] = (State.plants[i] + 1) % 6;
+            
             });
-            this.farmPlots.push(plot);
-            this.plotHitBoxes.push(plotHitBox);
+            const plant = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.Plant1);
+            plant.setScale(0.075);
+            this.plants.push(plant);
+            this.plots.push(plot);
         }
+        this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants);
+        this.visibleDuringPhase(Constants.Phases.Farm, ...this.plots);
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase !== Constants.Phases.Farm) { return; }
+            State.time = 0;
+        })
 
         // Hand Cards
         this.handCards = {};
@@ -160,7 +165,7 @@ export default class MainScene extends Phaser.Scene {
 
             // Show upgrade button if card has a higher level
 
-            
+
         });
     }
 
@@ -178,7 +183,7 @@ export default class MainScene extends Phaser.Scene {
         this.handCards[card.Key] = handCard;
     }
 
-    update() {
+    update(time, delta) {
         for (const object in this.handCards) {
             this.handCards[object].setVisible(false);
         }
@@ -191,10 +196,27 @@ export default class MainScene extends Phaser.Scene {
                 offset += 110;
             }
         }
-        for (const i in this.farmPlots) {
-            const plot = this.farmPlots[i];
-            plot.setTexture(Assets.Images['Plant' + State.plots[i]]);
+        if (State.phase === Constants.Phases.Farm) {
+            // TODO update plant plots
+            // Update plant images
+            for (const i in State.plants) {
+                const plant = this.plants[i];
+                const plot = this.plots[i];
+                const level = State.plants[i];
+                if (level !== 0) {
+                    plant.setVisible(true);
+                    plant.setTexture(Assets.Images['Plant' + Math.abs(level)]);
+                } else {
+                    plant.setVisible(false);
+                }
+            }
+
+            State.time += delta;
+            if (State.time > Constants.FarmingTime) {
+                this.gotoPhase(Constants.Phases.Market);
+            }
         }
+
     }
 
 }

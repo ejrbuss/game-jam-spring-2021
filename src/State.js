@@ -4,9 +4,9 @@ const State = {
     phase: undefined,
     // Player's current hand
     hand: [],
-    season: 0,
+    time: 0,
     // Farm plots (magnitude growth phase, neagtive needs water)
-    plots: [
+    plants: [
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -26,7 +26,7 @@ const State = {
         CardOveralls: 0,
         CardSprinkler: 0,
         CardTractor: 0,
-    }
+    },
 };
 
 window.State = State;

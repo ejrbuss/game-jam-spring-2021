@@ -14,7 +14,7 @@ const Constants = {
         End: 'End',
         Market: 'Market',
         Farm: 'Farm',
-    }
+    },
 };
 
 export default Constants;
