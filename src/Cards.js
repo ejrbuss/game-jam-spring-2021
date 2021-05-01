@@ -1,38 +1,68 @@
 import Assets from "./Assets";
 
 const Cards = {
-    TestCard1: {
-        Key: 'TestCard1',
-        Image: Assets.Images.Card,
+    CardSeed: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
+        level: 0,
     },
-    TestCard2: {
-        Key: 'TestCard2',
-        Image: Assets.Images.Card,
+    CardCow: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
+        level: 0,
     },
-    TestCard3: {
-        Key: 'TestCard3',
-        Image: Assets.Images.Card,
+    CardScarecrow: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
     },
-    TestCard4: {
-        Key: 'TestCard4',
-        Image: Assets.Images.Card,
+    CardTalisman: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
     },
-    TestCard5: {
-        Key: 'TestCard5',
-        Image: Assets.Images.Card,
+    CardOveralls: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
     },
-    TestCard6: {
-        Key: 'TestCard6',
-        Image: Assets.Images.Card,
+    CardSprinkler: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
     },
-    TestCard7: {
-        Key: 'TestCard7',
-        Image: Assets.Images.Card,
+    CardTractor: {
+        levels: [
+            { cost: 50 },
+            { cost: 100 },
+            { cost: 500 },
+        ],
     },
-    TestCard8: {
-        Key: 'TestCard8',
-        Image: Assets.Images.Card,
+    CardDrought: {
+    },
+    CardPestilence: {
+    },
+    CardPlague: {
     },
 };
+
+for (const key in Cards) {
+    Cards[key].Key = key;
+    Cards[key].Image = Assets.Images[key];
+}
 
 export default Cards;

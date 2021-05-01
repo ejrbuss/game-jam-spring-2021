@@ -38,14 +38,14 @@ export default class MainScene extends Phaser.Scene {
         this.marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
         this.marketObjects.push(this.marketBoard);
 
-        this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 50, Cards.TestCard1);
-        this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 50, Cards.TestCard2);
-        this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 50, Cards.TestCard3);
-        this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 250, Cards.TestCard4);
-        this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 250, Cards.TestCard5);
-        this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 250, Cards.TestCard6);
+        this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 50, Cards.CardCow);
+        this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 50, Cards.CardScarecrow);
+        this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 50, Cards.CardTalisman);
+        this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 250, Cards.CardOveralls);
+        this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 250, Cards.CardSprinkler);
+        this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 250, Cards.CardTractor);
 
-        this.createMarketCard(Constants.Width / 4 + 450, Constants.Height / 4 + 50, Cards.TestCard7, true);
+        this.createMarketCard(Constants.Width / 4 + 450, Constants.Height / 4 + 50, Cards.CardSeed, true);
 
         for (const object of this.marketObjects) {
             object.setVisible(false);
@@ -104,6 +104,7 @@ export default class MainScene extends Phaser.Scene {
         // TODO upgrade and buy buttons should be in a visibly disabled state if 
         // the player cannot afford them
         const marketCard = this.add.sprite(x, y, card.Image);
+        marketCard.setRotation(Phaser.Math.Between(-100, 100) / 500);
         if (upgradeOnly) {
             const upgradeButton = this.createButton(x, y + 100, Assets.Images.UpgradeButton, () => {});
             this.marketObjects.push(marketCard, upgradeButton);
@@ -115,6 +116,7 @@ export default class MainScene extends Phaser.Scene {
                 // TODO subtract player cash and update the other buy/upgrade states
                 State.hand.push(card);
                 // TODO create a prettier indication that the card has been bought
+                // Eg. a SOLD sign over the card
                 marketCard.setTint(0xff0000);
                 buyButton.setVisible(false);
                 if (State.hand.length === 5) {
@@ -181,7 +183,11 @@ export default class MainScene extends Phaser.Scene {
                 }
                 case 'market': {
                     // TODO Reset hand to seed + random curse
-                    State.hand = [ Cards.TestCard7, Cards.TestCard8 ];
+                    State.hand = [ Cards.CardSeed, [
+                        Cards.CardDrought,
+                        Cards.CardPestilence,
+                        Cards.CardPlague,
+                    ][Phaser.Math.Between(0, 2)] ];
                     // TODO animate marketBackground dropping down
                     // TODO animate blur of farm background
                     for (const object of this.marketObjects) {
