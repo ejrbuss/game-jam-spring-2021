@@ -1,17 +1,15 @@
 import Phaser from 'phaser';
+import Constants from './Constants';
+import MainScene from './MainScene';
 
-import HelloWorldScene from './scenes/HelloWorldScene';
-
-export default new Phaser.Game({
+const Game = new Phaser.Game({
     type: Phaser.AUTO,
-    width: 1024,
-    height: 576,
+    width: Constants.Width,
+    height: Constants.Height,
     canvasStyle: 'margin: auto; display: block;',
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 200 }
-        }
-    },
-    scene: [HelloWorldScene]
+    scene: MainScene,
 });
+
+window.Game = Game;
+
+export default Game;
