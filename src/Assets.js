@@ -17,6 +17,10 @@ const Assets = {
         BuyButtonClick: 'Images/BuyButtonClick.png',
 
         Card: 'Images/Card.png',
+
+        Plant0: 'Images/Plant0.png',
+        Plant1: 'Images/Plant1.png',
+        Plant2: 'Images/Plant2.png',
     },
     Sounds: {
     },
