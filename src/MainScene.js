@@ -97,6 +97,7 @@ export default class MainScene extends Phaser.Scene {
         this.plants= [];
         this.plots = [];
         this.plantTweens = [];
+        this.plotBoxes = [];
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
@@ -110,9 +111,23 @@ export default class MainScene extends Phaser.Scene {
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);
+                if (State.hand.includes(Cards.CardOveralls)) {
+                    const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
+                    for (const plotBox of returns) {
+                        if (State.plants[this.plotBoxes.indexOf(plotBox)] === 0) {
+                            plotBox.setVisible(true);
+                        }
+                    }
+                }
             });
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
                 plotBox.setVisible(false);
+                if (State.hand.includes(Cards.CardOveralls)) {
+                    const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
+                    for (const plotBox of returns) {
+                        plotBox.setVisible(false);
+                    }
+                }
             });
             plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
                 const level = State.plants[i];
@@ -120,6 +135,14 @@ export default class MainScene extends Phaser.Scene {
                 if (level === 0) {
                     this.sound.play(Assets.Sounds.Sow);
                     State.plants[i] = -1;
+                    if (State.hand.includes(Cards.CardOveralls)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plots);
+                        for (const plot of returns) {
+                            if (State.plants[this.plots.indexOf(plot)] === 0) {
+                                State.plants[this.plots.indexOf(plot)] = -1;
+                            }
+                        }
+                    }
                 }
                 // Water
                 else if (level <= 0) {
@@ -172,6 +195,7 @@ export default class MainScene extends Phaser.Scene {
             this.plants.push(plant);
             this.plots.push(plot);
             this.plantTweens.push(tween);
+            this.plotBoxes.push(plotBox);
         }
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants);
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plots);
@@ -306,6 +330,56 @@ export default class MainScene extends Phaser.Scene {
         corn.setScale(0.075);
         const offset = {x: Constants.Width - x, y: y};
         corn.setVelocity(offset.x, -offset.y);
+    }
+
+    AOEgetThings(level, i, things) {
+        let returns = [];
+        switch(level) {
+            case 2:
+                // get the plots in the diagonals, if applicable
+                let ulThing, urThing, llThing, lrThing;
+                if ((i > 9) && (i % 8 != 0)) {
+                    ulThing = things[i-9];
+                    returns.push(ulThing);
+                }
+                if ((i > 7) && ((i+1) % 8 != 0)) {
+                    urThing = things[i-7];
+                    returns.push(urThing);
+                }
+                if ((i < 32) && (i % 8 != 0)) {
+                    llThing = things[i+7];
+                    returns.push(llThing);
+                }
+                if ((i < 31) && ((i+1) % 8 != 0)) {
+                    lrThing = things[i+9];
+                    returns.push(lrThing);
+                }
+            case 1:
+                // get the plots above and below, if applicable
+                let aboveThing, belowThing;
+                if (i > 7) {
+                    aboveThing = things[i-8];
+                    returns.push(aboveThing);
+                }
+                if (i < 32) {
+                    belowThing = things[i+8];
+                    returns.push(belowThing);
+                }
+            case 0:
+                // get the plots on the left and right, if applicable
+                let leftThing, rightThing;
+                if ((i != 0) && (i % 8 != 0)) {
+                    leftThing = things[i-1];
+                    returns.push(leftThing);
+                }
+                if ((i != this.plotBoxes.length-1) && ((i+1) % 8 != 0)) {
+                    rightThing = things[i+1];
+                    returns.push(rightThing);
+                }
+                break;
+            default: break;
+        }
+        return returns;
     }
 
     visibleDuringPhase(phase, ...objects) {
