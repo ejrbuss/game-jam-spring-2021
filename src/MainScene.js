@@ -76,13 +76,16 @@ export default class MainScene extends Phaser.Scene {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
             const plot = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.PlotDry);
+            const plotBox = this.add.rectangle(x * 75 + 175, y * 75 + 100, 70, 70);
+            plotBox.setStrokeStyle(2, 0x121200);
+            plotBox.setVisible(false);
             plot.setScale(0.075);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
-
+                plotBox.setVisible(true);                
             });
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
-
+                plotBox.setVisible(false);
             });
             plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
                 const level = State.plants[i];
@@ -105,8 +108,8 @@ export default class MainScene extends Phaser.Scene {
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
             });
             const plant = this.add.sprite(
-                x * 75 + 175 + Math.random() * 10, 
-                y * 70 + 100 + Math.random() * 10, 
+                x * 75 + 175 + Math.random() * 8, 
+                y * 75 + 100 + Math.random() * 8, 
                 Assets.Images.Plant1,
             );
             plant.setScale(0.075);
