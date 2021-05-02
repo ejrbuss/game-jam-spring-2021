@@ -377,11 +377,27 @@ export default class MainScene extends Phaser.Scene {
         }
 
         const blackScreen = this.add.rectangle(Constants.Width / 2, Constants.Height / 2, Constants.Width, Constants.Height, 0x0);
+        const introText = this.add.text(105 * U, Constants.Height / 2 - 10 * U, "Earn $1000 clicking the cobs and achieve your dreams!", { fontFamily: 'Nunito-Light', fontSize: 32 * U });
+        introText.setAlpha(0);
         this.add.tween({
-            targets: blackScreen,
+            targets: [introText],
+            duration: 500,
+            ease: 'sine',
+            alpha: 1,
+        });
+        this.add.tween({
+            targets: [introText],
             duration: 500,
             ease: 'sine',
             alpha: 0,
+            delay: 2000,
+        })
+        this.add.tween({
+            targets: [introText, blackScreen],
+            duration: 500,
+            ease: 'sine',
+            alpha: 0,
+            delay: 2500,
         });
         this.gotoPhase(Constants.Phases.Start);
     }
