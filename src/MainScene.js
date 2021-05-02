@@ -139,6 +139,18 @@ export default class MainScene extends Phaser.Scene {
         this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4 + 225 * U, Cards.CardSprinkler);
         this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4 + 225 * U, Cards.CardTractor);
         this.createMarketCard(Constants.Width / 4 + 575 * U, Constants.Height / 4 + 125 * U, Cards.CardSeed);
+        
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase !== Constants.Phases.Market) { return; }
+            State.cursedCard = [
+                Cards.CardCow,
+                Cards.CardScarecrow,
+                Cards.CardTalisman,
+                Cards.CardOveralls,
+                Cards.CardSprinkler,
+                Cards.CardTractor,
+            ][Phaser.Math.Between(0, 5)];
+        })
 
         // Farm plots
         this.plants= [];
@@ -260,8 +272,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     createMarketCard(x, y, card) {
-        // TODO upgrade and buy buttons should be in a visibly disabled state if 
-        // the player cannot afford them
         const marketCard = this.add.sprite(x, y, card.Image);
         // marketCard.setRotation(rotation);
 
@@ -322,6 +332,14 @@ export default class MainScene extends Phaser.Scene {
                 if ( (State.hand.includes(card))                            // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].buyCost) )  // the user does not have enough money
                 { return; }
+                if (card === State.cursedCard) {
+                    let curse = [
+                        Cards.CardPestilence,
+                        Cards.CardPlague,
+                        Cards.CardDrought,
+                    ].filter(x => !State.hand.includes(x))[Phaser.Math.Between(0, 1)];
+                    State.hand.push(curse);
+                }
                 State.playerMoney -= card.levels[curLevel].buyCost;
                 this.sound.play(Assets.Sounds.Buy);
                 State.hand.push(card);
@@ -335,11 +353,19 @@ export default class MainScene extends Phaser.Scene {
         }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
-            
+            // TODO show the card level in a proper manner
+            levelIndicator.setText(`Level ${curLevel + 1}`);
+            // clear tints and then we're gonna reapply them
+            marketCard.clearTint();
+            upgradeButton.clearTint();
+            if (buyButton) buyButton.clearTint();
             if (curLevel + 1 == card.levels.length) {
                 upgradeButton.setTint(0xff0000);
             }
-            
+            if (card === State.cursedCard) {
+                console.log('here, card is ', card);
+                marketCard.setTint(0xff00ff);
+            }
             if ( (card != Cards.CardSeed)
               && (State.hand.includes(card)) ) {
                 // TODO create a prettier indication that the card has been bought
@@ -349,6 +375,14 @@ export default class MainScene extends Phaser.Scene {
                 if (buyButton) buyButton.setTint(0xff0000);
             }
             else {
+                if (State.hand.length >= 4) {
+                    if (card === State.cursedCard) {
+                        console.log('here2, card is ', card);
+                        marketCard.setTint(0xff0088);
+                        upgradeButton.setTint(0xff0000);
+                        if (buyButton) buyButton.setTint(0xff0000);
+                    }
+                }
                 if (State.playerMoney < card.levels[curLevel].buyCost) {
                     if (buyButton) buyButton.setTint(0xff0000);
                 }
@@ -367,6 +401,7 @@ export default class MainScene extends Phaser.Scene {
 
         });
         this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase !== Constants.Phases.Market) { return; }
             marketCard.clearTint();
             if (buyButton) buyButton.clearTint();
             if (State.cardLevels[card.Key] + 1 < card.levels.length) {
