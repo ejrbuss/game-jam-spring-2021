@@ -85,7 +85,7 @@ export default class MainScene extends Phaser.Scene {
         const startButton = this.createButton(
             Constants.Width / 2, 
             Constants.Height / 2,
-            1 * U,
+            0.35 * U,
             Assets.Images.StartButton, 
             () => { 
                 this.gotoPhase(Constants.Phases.Market) 
