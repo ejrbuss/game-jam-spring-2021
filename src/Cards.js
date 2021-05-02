@@ -79,6 +79,7 @@ const Cards = {
 for (const key in Cards) {
     Cards[key].Key = key;
     Cards[key].Image = Assets.Images[key];
+    Cards[key].ImageDisabled = Assets.Images[key.replace('.png', 'Disabled.png')];
 }
 
 export default Cards;

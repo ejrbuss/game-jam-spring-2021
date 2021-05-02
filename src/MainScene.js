@@ -58,7 +58,7 @@ export default class MainScene extends Phaser.Scene {
         this.events.addListener(Constants.Events.EnterPhase, () => {
             // TODO animate blur
             switch (State.phase) {
-                case Constants.Phases.Start:
+                case Constants.Phases.Start: background.setTexture(Assets.Images.FarmTitleBackground); break;
                 case Constants.Phases.End:
                 case Constants.Phases.Market: background.setTexture(Assets.Images.FarmBackground); break;
                 case Constants.Phases.Farm: background.setTexture(Assets.Images.FarmPlotBackground); break;
@@ -83,8 +83,8 @@ export default class MainScene extends Phaser.Scene {
 
         // Start screen
         const startButton = this.createButton(
-            Constants.Width / 2, 
-            Constants.Height / 2,
+            Constants.Width / 2 - 90 * U, 
+            Constants.Height / 2 + 50 * U,
             0.35 * U,
             Assets.Images.StartButton, 
             () => { 
@@ -298,7 +298,9 @@ export default class MainScene extends Phaser.Scene {
         button.setScale(scale);
         button.setInteractive();
         button.on(Phaser.Input.Events.POINTER_OVER, () => {
-            button.setTint(0xdddddd);
+            if (!button.texture.key.endsWith('Disabled.png')) {
+                button.setTint(0xdddddd);
+            }
         });
         button.on(Phaser.Input.Events.POINTER_OUT, () => {
             button.clearTint();
@@ -396,10 +398,16 @@ export default class MainScene extends Phaser.Scene {
             let curLevel = State.cardLevels[card.Key];
             // clear tints and then we're gonna reapply them
             marketCard.clearTint();
-            upgradeButton.clearTint();
-            if (buyButton) buyButton.clearTint();
+            marketCard.setTexture(card.Image);
+            marketCard.setVisible(true);
+            upgradeButton.setTexture(Assets.Images.UpgradeButton);
+            upgradeButton.setVisible(true);
+            if (buyButton) {
+                buyButton.setTexture(Assets.Images.BuyButton);
+                buyButton.setVisible(true);
+            }
             if (curLevel == card.levels.length) {
-                upgradeButton.setTint(0xff0000);
+                upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
             }
             if (card === State.cursedCard) {
                 marketCard.setTint(0xff00ff);
@@ -408,24 +416,30 @@ export default class MainScene extends Phaser.Scene {
               && (State.hand.includes(card)) ) {
                 // TODO create a prettier indication that the card has been bought
                 // Eg. a SOLD sign over the card
-                marketCard.setTint(0xff0000);
-                upgradeButton.setTint(0xff0000);
-                if (buyButton) buyButton.setTint(0xff0000);
+                marketCard.setVisible(false);
+                upgradeButton.setVisible(false);
+                if (buyButton) {
+                    buyButton.setVisible(false);
+                }
             } else {
                 if (State.hand.length >= 4) {
                     if (card === State.cursedCard) {
                         marketCard.setTint(0xff0088);
-                        upgradeButton.setTint(0xff0000);
-                        if (buyButton) buyButton.setTint(0xff0000);
+                        upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
+                        if (buyButton) {
+                            buyButton.setTexture(Assets.Images.BuyButtonDisabled);
+                        }
                     }
                 }
                 if (curLevel < card.levels.length) {
                     if (State.playerMoney < card.levels[curLevel].buyCost) {
-                        if (buyButton) buyButton.setTint(0xff0000);
+                        if (buyButton) {
+                            buyButton.setTexture(Assets.Images.BuyButtonDisabled);
+                        }
                     }
                     if ( (State.playerMoney < card.levels[curLevel].upgradeCost)
                     || (curLevel == card.levels.length) ) {
-                        upgradeButton.setTint(0xff0000);
+                        upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
                     }
                 }
             }
