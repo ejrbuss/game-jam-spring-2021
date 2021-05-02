@@ -85,72 +85,13 @@ export default class MainScene extends Phaser.Scene {
         const startButton = this.createButton(
             Constants.Width / 2, 
             Constants.Height / 2,
-            1 * U,
+            0.35 * U,
             Assets.Images.StartButton, 
             () => { 
                 this.gotoPhase(Constants.Phases.Market) 
             });
         this.visibleDuringPhase(Constants.Phases.Start, startButton);
 
-        // Market
-        this.events.addListener(Constants.Events.EnterPhase, () => {
-            if (State.phase !== Constants.Phases.Market) { return; }
-            // Reset players hand
-            State.hand = [
-                Cards.CardSeed,
-                [
-                    Cards.CardPestilence,
-                    Cards.CardPlague,
-                    Cards.CardDrought,
-                ][Phaser.Math.Between(0, 2)],
-            ];
-            // Tell market cards to refresh
-            setTimeout(() => this.events.emit(Constants.Events.RefreshMarket));
-
-        });
-        const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
-        const continueButton = this.createButton(Constants.Width - 100 * U, Constants.Height - 50 * U, 0.3 * U, Assets.Images.ContinueButton, () => {
-            this.gotoPhase(Constants.Phases.Farm);
-        });
-        continueButton.on(Phaser.Input.Events.POINTER_OVER, () => {
-            this.add.tween({
-                targets: continueButton,
-                rotation: 0.1,
-                duration: 500,
-                ease: 'bounce',
-            });
-        });
-        continueButton.on(Phaser.Input.Events.POINTER_OUT, () => {
-            this.add.tween({
-                targets: continueButton,
-                rotation: 0,
-                duration: 500,
-                ease: 'bounce',
-            });
-        });
-        marketBoard.setDisplaySize(Constants.Width - 60 * U, Constants.Height - 60 * U);
-        marketBoard.setRotation(0.05);
-        this.visibleDuringPhase(Constants.Phases.Market, marketBoard, continueButton);
-
-        this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4, Cards.CardCow);
-        this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4, Cards.CardScarecrow);
-        this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4, Cards.CardTalisman);
-        this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4 + 225 * U, Cards.CardOveralls);
-        this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4 + 225 * U, Cards.CardSprinkler);
-        this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4 + 225 * U, Cards.CardTractor);
-        this.createMarketCard(Constants.Width / 4 + 575 * U, Constants.Height / 4 + 125 * U, Cards.CardSeed);
-        
-        this.events.addListener(Constants.Events.EnterPhase, () => {
-            if (State.phase !== Constants.Phases.Market) { return; }
-            State.cursedCard = [
-                Cards.CardCow,
-                Cards.CardScarecrow,
-                Cards.CardTalisman,
-                Cards.CardOveralls,
-                Cards.CardSprinkler,
-                Cards.CardTractor,
-            ][Phaser.Math.Between(0, 5)];
-        })
 
         // Farm plots
         this.plants= [];
@@ -215,7 +156,99 @@ export default class MainScene extends Phaser.Scene {
             if (State.phase !== Constants.Phases.Farm) { return; }
             State.time = 0;
             State.lastTick = 0;
-        })
+        });
+
+        this.createSeasonWheel();
+        this.visibleDuringPhase(Constants.Phases.Farm);
+
+        // Market
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase !== Constants.Phases.Market) { return; }
+            // Reset players hand
+            State.hand = [
+                Cards.CardSeed,
+                [
+                    Cards.CardPestilence,
+                    Cards.CardPlague,
+                    Cards.CardDrought,
+                ][Phaser.Math.Between(0, 2)],
+            ];
+            State.cursedCard = [
+                Cards.CardCow,
+                Cards.CardScarecrow,
+                Cards.CardTalisman,
+                Cards.CardOveralls,
+                Cards.CardSprinkler,
+                Cards.CardTractor,
+            ][Phaser.Math.Between(0, 5)];
+            // Tell market cards to refresh
+            setTimeout(() => this.events.emit(Constants.Events.RefreshMarket));
+
+        });
+        this.marketAnimated = [];
+        const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2 - 30 * U, Assets.Images.MarketBackground);
+        const continueButton = this.createButton(Constants.Width - 100 * U, Constants.Height - 50 * U, 0.3 * U, Assets.Images.ContinueButton, () => {
+            this.gotoPhase(Constants.Phases.Farm);
+        });
+        continueButton.on(Phaser.Input.Events.POINTER_OVER, () => {
+            this.add.tween({
+                targets: continueButton,
+                rotation: 0.1,
+                duration: 500,
+                ease: 'bounce',
+            });
+        });
+        continueButton.on(Phaser.Input.Events.POINTER_OUT, () => {
+            this.add.tween({
+                targets: continueButton,
+                rotation: 0,
+                duration: 500,
+                ease: 'bounce',
+            });
+        });
+        marketBoard.setDisplaySize(Constants.Width - 60 * U, Constants.Height - 55 * U);
+        this.marketAnimated.push(marketBoard);
+        this.visibleDuringPhase(Constants.Phases.Market, continueButton);
+
+        this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4, Cards.CardCow);
+        this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4, Cards.CardScarecrow);
+        this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4, Cards.CardTalisman);
+        this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4 + 225 * U, Cards.CardOveralls);
+        this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4 + 225 * U, Cards.CardSprinkler);
+        this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4 + 225 * U, Cards.CardTractor);
+        this.createMarketCard(Constants.Width / 4 + 575 * U, Constants.Height / 4 + 125 * U, Cards.CardSeed);
+        
+        for (const target of this.marketAnimated) {
+            target.setY(target.y - Constants.Height);
+        }
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase === Constants.Phases.Farm || State.phase === Constants.Phases.Market) {
+                this.sound.play(Assets.Sounds.BoardFall, {
+                    volume: 2,
+                });
+            }
+            if (State.phase !== Constants.Phases.Market) { return; }
+            for (const target of this.marketAnimated) {
+                this.add.tween({
+                    targets: target,
+                    y: target.y + Constants.Height,
+                    duration: 1000,
+                    ease: 'Bounce',
+                });
+            }
+
+        });
+        this.events.addListener(Constants.Events.ExitPhase, () => {
+            if (State.phase !== Constants.Phases.Market) { return; }
+            for (const target of this.marketAnimated) {
+                this.add.tween({
+                    targets: target,
+                    y: target.y - Constants.Height,
+                    duration: 1000,
+                    ease: 'Bounce',
+                });
+            }
+        });
 
         // Hand Cards
         this.handCards = {};
@@ -250,6 +283,14 @@ export default class MainScene extends Phaser.Scene {
                 object.setVisible(State.phase === phase);
             }
         });
+    }
+
+    createSeasonWheel() {
+        this.seasonWheel = this.add.sprite(Constants.Width - 100 * U, 100 * U, Assets.Images.SeasonWheel);
+        const seasonArrow = this.add.sprite(Constants.Width - 99 * U, 81 * U, Assets.Images.SeasonWheelArrow);
+        this.seasonWheel.setScale(0.20 * U);
+        seasonArrow.setScale(0.20 * U);
+        this.visibleDuringPhase(Constants.Phases.Farm, this.seasonWheel, seasonArrow);
     }
 
     createButton(x, y, scale, buttonAsset, onClick) {
@@ -310,7 +351,8 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton);
+            // this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton);
+            this.marketAnimated.push(marketCard, star, upgradeButton);
         }
         else
         {
@@ -345,9 +387,10 @@ export default class MainScene extends Phaser.Scene {
                     this.gotoPhase(Constants.Phases.Farm);
                 }
                 this.events.emit(Constants.Events.RefreshMoney);
-                this.events.emit(Constants.Events.RefreshMarket);
+                this.events.emit(Constants.Events.RefreshMarket);                
             });
-            this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton, buyButton);
+            // this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton, buyButton);
+            this.marketAnimated.push(marketCard, star, upgradeButton, buyButton);
         }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
@@ -483,6 +526,11 @@ export default class MainScene extends Phaser.Scene {
             if (State.time > Constants.FarmingTime) {
                 this.gotoPhase(Constants.Phases.Market);
             } else if (State.time - State.lastTick > 100) {
+
+                let newRotation = State.time / Constants.FarmingTime;
+                newRotation = newRotation * Math.PI * 2 * -1; // -1 to rotate counterclockwise
+                this.seasonWheel.setRotation(newRotation);
+
                 const i = Phaser.Math.Between(0, State.plants.length);
                 const level = State.plants[i];
                 if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
