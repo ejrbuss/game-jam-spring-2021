@@ -377,11 +377,27 @@ export default class MainScene extends Phaser.Scene {
         }
 
         const blackScreen = this.add.rectangle(Constants.Width / 2, Constants.Height / 2, Constants.Width, Constants.Height, 0x0);
+        const introText = this.add.text(105 * U, Constants.Height / 2 - 10 * U, "Earn $1000 clicking the cobs and achieve your dreams!", { fontFamily: 'Nunito-Light', fontSize: 32 * U });
+        introText.setAlpha(0);
         this.add.tween({
-            targets: blackScreen,
+            targets: [introText],
+            duration: 500,
+            ease: 'sine',
+            alpha: 1,
+        });
+        this.add.tween({
+            targets: [introText],
             duration: 500,
             ease: 'sine',
             alpha: 0,
+            delay: 2000,
+        })
+        this.add.tween({
+            targets: [introText, blackScreen],
+            duration: 500,
+            ease: 'sine',
+            alpha: 0,
+            delay: 2500,
         });
         this.gotoPhase(Constants.Phases.Start);
     }
@@ -789,7 +805,14 @@ export default class MainScene extends Phaser.Scene {
                         State.plants[i] = -level;
                     }
                     // Crows crows crows
-                    if ( (Constants.CrowChance > Math.random())
+                    let crowMultiplier = 1;
+                    if (State.hand.includes(Cards.CardPestilence) && !State.hand.includes(Cards.CardTalisman)) {
+                        crowMultiplier = 2;
+                    }
+                    if (State.hand.includes(Cards.CardScarecrow)) {
+                        crowMultiplier / State.cardLevels.CardScarecrow + 2;
+                    }
+                    if ( (Constants.CrowChance * crowMultiplier > Math.random())
                         && (this.crows[i].dead)
                         && (State.plants[i] !== 0)
                     ) {
