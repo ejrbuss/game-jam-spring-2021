@@ -1,7 +1,7 @@
 const Constants = {
-    Width: 1024 * window.devicePixelRatio,
-    Height: 576 * window.devicePixelRatio,
-    Unit: window.devicePixelRatio,
+    Width: 1024 * 2, //* window.devicePixelRatio,
+    Height: 576 * 2, // * window.devicePixelRatio,
+    Unit: 2,//  window.devicePixelRatio,
     FarmingTime: 1000 * 30,
     GrowthChance: 0.1,
     // Game Events

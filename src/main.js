@@ -8,6 +8,7 @@ const Game = new Phaser.Game({
     height: Constants.Height,
     canvasStyle: 'margin: auto; display: block; width: 1280; height: 720;',
     scene: MainScene,
+    antialias: true,
 });
 
 window.Game = Game;
