@@ -20,6 +20,13 @@ const Constants = {
         Market: 'Market',
         Farm: 'Farm',
     },
+    // Market Button Info
+    MarketTextStates: {
+        fontFamily: 'Nunito-SemiBold',
+        fontSize: 12 * 2, // 2 = unit
+        align: 'center',
+        color: '#000',
+    },
 };
 
 export default Constants;

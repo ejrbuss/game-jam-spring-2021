@@ -97,6 +97,7 @@ export default class MainScene extends Phaser.Scene {
         this.plants= [];
         this.plots = [];
         this.plantTweens = [];
+        this.plotBoxes = [];
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
@@ -110,9 +111,25 @@ export default class MainScene extends Phaser.Scene {
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);
+                if (State.plants[i] === 0) {
+                    if (State.hand.includes(Cards.CardOveralls)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
+                        for (const plotBox of returns) {
+                            if (State.plants[this.plotBoxes.indexOf(plotBox)] === 0) {
+                                plotBox.setVisible(true);
+                            }
+                        }
+                    }
+                }
             });
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
                 plotBox.setVisible(false);
+                if (State.hand.includes(Cards.CardOveralls)) {
+                    const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
+                    for (const plotBox of returns) {
+                        plotBox.setVisible(false);
+                    }
+                }
             });
             plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
                 const level = State.plants[i];
@@ -120,6 +137,14 @@ export default class MainScene extends Phaser.Scene {
                 if (level === 0) {
                     this.sound.play(Assets.Sounds.Sow);
                     State.plants[i] = -1;
+                    if (State.hand.includes(Cards.CardOveralls)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plots);
+                        for (const plot of returns) {
+                            if (State.plants[this.plots.indexOf(plot)] === 0) {
+                                State.plants[this.plots.indexOf(plot)] = -1;
+                            }
+                        }
+                    }
                 }
                 // Water
                 else if (level <= 0) {
@@ -172,6 +197,7 @@ export default class MainScene extends Phaser.Scene {
             this.plants.push(plant);
             this.plots.push(plot);
             this.plantTweens.push(tween);
+            this.plotBoxes.push(plotBox);
         }
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants);
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plots);
@@ -309,6 +335,56 @@ export default class MainScene extends Phaser.Scene {
         corn.setVelocity(offset.x, -offset.y);
     }
 
+    AOEgetThings(level, i, things) {
+        let returns = [];
+        switch(level) {
+            case 2:
+                // get the plots in the diagonals, if applicable
+                let ulThing, urThing, llThing, lrThing;
+                if ((i > 9) && (i % 8 != 0)) {
+                    ulThing = things[i-9];
+                    returns.push(ulThing);
+                }
+                if ((i > 7) && ((i+1) % 8 != 0)) {
+                    urThing = things[i-7];
+                    returns.push(urThing);
+                }
+                if ((i < 32) && (i % 8 != 0)) {
+                    llThing = things[i+7];
+                    returns.push(llThing);
+                }
+                if ((i < 31) && ((i+1) % 8 != 0)) {
+                    lrThing = things[i+9];
+                    returns.push(lrThing);
+                }
+            case 1:
+                // get the plots above and below, if applicable
+                let aboveThing, belowThing;
+                if (i > 7) {
+                    aboveThing = things[i-8];
+                    returns.push(aboveThing);
+                }
+                if (i < 32) {
+                    belowThing = things[i+8];
+                    returns.push(belowThing);
+                }
+            case 0:
+                // get the plots on the left and right, if applicable
+                let leftThing, rightThing;
+                if ((i != 0) && (i % 8 != 0)) {
+                    leftThing = things[i-1];
+                    returns.push(leftThing);
+                }
+                if ((i != this.plotBoxes.length-1) && ((i+1) % 8 != 0)) {
+                    rightThing = things[i+1];
+                    returns.push(rightThing);
+                }
+                break;
+            default: break;
+        }
+        return returns;
+    }
+
     visibleDuringPhase(phase, ...objects) {
         this.events.addListener(Constants.Events.EnterPhase, () => {
             for (const object of objects) {
@@ -374,8 +450,10 @@ export default class MainScene extends Phaser.Scene {
 
         let upgradeButton;
         let buyButton;
+        let upgradeText;
+        let buyText;
         if (card === Cards.CardSeed) {
-            upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
+            upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.RockButtonUpgrade, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (curLevel + 1 >= card.levels.length)                      // the card is max level
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
@@ -385,12 +463,13 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
+            upgradeText = this.add.text(x - 40 * U, y + 92 * U, "Upgrade: $XXX", Constants.MarketTextStates);
             // this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton);
-            this.marketAnimated.push(marketCard, star, upgradeButton);
+            this.marketAnimated.push(marketCard, star, upgradeButton, upgradeText);
         }
         else
         {
-            upgradeButton = this.createButton(x - 28 * U, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
+            upgradeButton = this.createButton(x, y + 80 * U, 0.15 * U, Assets.Images.RockButtonUpgrade, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (curLevel + 1 >= card.levels.length)                           // the card is max level
                   || (State.hand.includes(card))                                // the card is already in hand
@@ -401,7 +480,8 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            buyButton = this.createButton(x + 40 * U, y + 100 * U, 0.15 * U, Assets.Images.BuyButton, () => {
+            upgradeText = this.add.text(x - 40 * U, y + 72 * U, "Upgrade: $XXX", Constants.MarketTextStates);
+            buyButton = this.createButton(x, y + 105 * U, 0.15 * U, Assets.Images.RockButtonBuy, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (State.hand.includes(card))                            // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].buyCost) )  // the user does not have enough money
@@ -423,8 +503,9 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);                
             });
+            buyText = this.add.text(x - 30 * U, y + 98 * U, "Buy: $XXX", Constants.MarketTextStates);
             // this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton, buyButton);
-            this.marketAnimated.push(marketCard, star, upgradeButton, buyButton);
+            this.marketAnimated.push(marketCard, star, upgradeButton, buyButton, upgradeText, buyText);
         }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
@@ -433,14 +514,26 @@ export default class MainScene extends Phaser.Scene {
             marketCard.setTexture(card.Image);
             marketCard.setVisible(true);
             star.setVisible(true);
-            upgradeButton.setTexture(Assets.Images.UpgradeButton);
-            upgradeButton.setVisible(true);
+            upgradeButton.setTexture(Assets.Images.RockButtonUpgrade);
+            
+            const upgradeCost = card.levels[State.cardLevels[card.Key]].upgradeCost;
+            if (upgradeCost > 0) {
+                upgradeButton.setVisible(true);
+                upgradeText.setVisible(true);
+                upgradeText.setText("Upgrade: $" + upgradeCost);
+            } else {
+                upgradeButton.setVisible(false);
+                upgradeText.setVisible(false);
+            }
+
             if (buyButton) {
-                buyButton.setTexture(Assets.Images.BuyButton);
+                buyButton.setTexture(Assets.Images.RockButtonBuy);
                 buyButton.setVisible(true);
+                buyText.setVisible(true);
+                buyText.setText("Buy: $" + card.levels[State.cardLevels[card.Key]].buyCost);
             }
             if (curLevel + 1 == card.levels.length) {
-                upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
+                upgradeButton.setTexture(Assets.Images.RockButtonDisabled);
             }
             if (card === State.cursedCard) {
                 marketCard.setTint(0xff00ff);
@@ -452,28 +545,30 @@ export default class MainScene extends Phaser.Scene {
                 marketCard.setVisible(false);
                 star.setVisible(false);
                 upgradeButton.setVisible(false);
+                upgradeText.setVisible(false);
                 if (buyButton) {
                     buyButton.setVisible(false);
+                    buyText.setVisible(false);
                 }
             } else {
                 if (State.hand.length >= 4) {
                     if (card === State.cursedCard) {
                         marketCard.setTint(0xff0088);
-                        upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
+                        upgradeButton.setTexture(Assets.Images.RockButtonDisabled);
                         if (buyButton) {
-                            buyButton.setTexture(Assets.Images.BuyButtonDisabled);
+                            buyButton.setTexture(Assets.Images.RockButtonDisabled);
                         }
                     }
                 }
                 if (curLevel < card.levels.length) {
                     if (State.playerMoney < card.levels[curLevel].buyCost) {
                         if (buyButton) {
-                            buyButton.setTexture(Assets.Images.BuyButtonDisabled);
+                            buyButton.setTexture(Assets.Images.RockButtonDisabled);
                         }
                     }
                     if ( (State.playerMoney < card.levels[curLevel].upgradeCost)
                     || (curLevel == card.levels.length) ) {
-                        upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
+                        upgradeButton.setTexture(Assets.Images.RockButtonDisabled);
                     }
                 }
             }
@@ -538,6 +633,10 @@ export default class MainScene extends Phaser.Scene {
         }
         for (const object in this.handCardsStars) {
             this.handCardsStars[object].setVisible(false);
+        }
+        if (State.playerMoney >= 1000) {
+            console.log('YOU WIN!');
+            this.scene.start('CreditsScene');
         }
         if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
             let offset = 75 * U;

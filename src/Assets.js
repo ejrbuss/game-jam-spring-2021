@@ -9,6 +9,8 @@ const Assets = {
         FarmBackgroundWinter: 'Images/FarmBackgroundWinter.png',
         MarketBackground: 'Images/MarketBackground.png',
         MoneyBoard: 'Images/MoneyBoard.png',
+        Space: 'Images/space.png',
+        SpaceCorn: 'Images/spaceCorn.png',
 
         StartButton: 'Images/StartButton.png',
         UpgradeButton: 'Images/UpgradeButton.png',
@@ -16,6 +18,9 @@ const Assets = {
         BuyButton: 'Images/BuyButton.png',
         BuyButtonDisabled: 'Images/BuyButtonDisabled.png',
         ContinueButton: 'Images/ContinueButton.png',
+        RockButtonBuy: 'Images/RockButtonBuy.png',
+        RockButtonUpgrade: 'Images/RockButtonUpgrade.png',
+        RockButtonDisabled: 'Images/RockButtonDisabled.png',
 
         SelectionSquare: 'Images/SelectionSquare.png',
 
