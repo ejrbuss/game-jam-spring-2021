@@ -110,9 +110,9 @@ export default class MainScene extends Phaser.Scene {
                     State.plants[i] = -level;
                 }
                 // Harvest
-                if (level === 5) {
+                if (level === State.cardLevels.CardSeed + 2) {
                     State.plants[i] = 0;
-                    State.playerMoney += 100;
+                    State.playerMoney += 20 * (State.cardLevels.CardSeed + 2);
                     this.events.emit(Constants.Events.RefreshMoney);
                 }
             });
@@ -264,7 +264,9 @@ export default class MainScene extends Phaser.Scene {
                 const i = Phaser.Math.Between(0, State.plants.length);
                 const level = State.plants[i];
                 if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
-                    State.plants[i] += 1;
+                    if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
+                        State.plants[i] += 1;
+                    }
                 }
             }
         }
