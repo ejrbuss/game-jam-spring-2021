@@ -5,6 +5,7 @@ const Constants = {
     FarmingTime: 1000 * 30,
     GrowthChance: 0.1,
     WiltingChance: 0.85,
+    DryingChance: 0.70,
     // Game Events
     Events: {
         ExitPhase: 'ExitPhase',
