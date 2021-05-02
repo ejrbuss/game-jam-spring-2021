@@ -103,9 +103,9 @@ export default class MainScene extends Phaser.Scene {
             const xPos = x * 80 * U + 148 * U;
             const yPos = y * 80 * U + 78 * U;
             const plot = this.add.sprite(xPos, yPos, Assets.Images.PlotDry);
-            const plotBox = this.add.rectangle(xPos, yPos, 70 * U, 70 * U);
-            plotBox.setStrokeStyle(2, 0x121200);
+            const plotBox = this.add.sprite(xPos, yPos, Assets.Images.SelectionSquare);
             plotBox.setVisible(false);
+            plotBox.setScale(0.3);
             plot.setScale(0.08 * U);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {

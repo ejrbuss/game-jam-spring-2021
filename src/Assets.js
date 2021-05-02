@@ -17,6 +17,8 @@ const Assets = {
         BuyButtonDisabled: 'Images/BuyButtonDisabled.png',
         ContinueButton: 'Images/ContinueButton.png',
 
+        SelectionSquare: 'Images/SelectionSquare.png',
+
         CardSeed: 'Images/CardSeed.png',
         CardCow: 'Images/CardCow.png',
         CardScarecrow: 'Images/CardScarecrow.png',
