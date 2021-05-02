@@ -8,6 +8,7 @@ const Assets = {
         StartButton: 'Images/StartButton.png',
         UpgradeButton: 'Images/UpgradeButton.png',
         BuyButton: 'Images/BuyButton.png',
+        ContinueButton: 'Images/ContinueButton.png',
 
         CardSeed: 'Images/CardSeed.png',
         CardCow: 'Images/CardCow.png',

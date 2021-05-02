@@ -75,9 +75,28 @@ export default class MainScene extends Phaser.Scene {
 
         });
         const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
+        const continueButton = this.createButton(Constants.Width - 100 * U, Constants.Height - 50 * U, 0.3 * U, Assets.Images.ContinueButton, () => {
+            this.gotoPhase(Constants.Phases.Farm);
+        });
+        continueButton.on(Phaser.Input.Events.POINTER_OVER, () => {
+            this.add.tween({
+                targets: continueButton,
+                rotation: 0.1,
+                duration: 500,
+                ease: 'bounce',
+            });
+        });
+        continueButton.on(Phaser.Input.Events.POINTER_OUT, () => {
+            this.add.tween({
+                targets: continueButton,
+                rotation: 0,
+                duration: 500,
+                ease: 'bounce',
+            });
+        });
         marketBoard.setDisplaySize(Constants.Width - 60 * U, Constants.Height - 60 * U);
         marketBoard.setRotation(0.05);
-        this.visibleDuringPhase(Constants.Phases.Market, marketBoard);
+        this.visibleDuringPhase(Constants.Phases.Market, marketBoard, continueButton);
 
         this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4, Cards.CardCow);
         this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4, Cards.CardScarecrow);
