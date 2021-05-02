@@ -18,6 +18,9 @@ const Assets = {
         BuyButton: 'Images/BuyButton.png',
         BuyButtonDisabled: 'Images/BuyButtonDisabled.png',
         ContinueButton: 'Images/ContinueButton.png',
+        RockButtonBuy: 'Images/RockButtonBuy.png',
+        RockButtonUpgrade: 'Images/RockButtonUpgrade.png',
+        RockButtonDisabled: 'Images/RockButtonDisabled.png',
 
         SelectionSquare: 'Images/SelectionSquare.png',
 
