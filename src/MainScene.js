@@ -96,6 +96,7 @@ export default class MainScene extends Phaser.Scene {
         // Farm plots
         this.plants= [];
         this.plots = [];
+        this.plantTweens = [];
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
@@ -147,8 +148,19 @@ export default class MainScene extends Phaser.Scene {
                 Assets.Images.Plant1,
             );
             plant.setScale(0.075 * U);
+            const tween = this.add.tween({
+                targets: plant,
+                rotation: 0.1,
+                duration: 250,
+                ease: 'sine',
+                loop: true,
+                repeat: -1,
+                yoyo: true,
+                delay: Math.random() * 500,
+            })
             this.plants.push(plant);
             this.plots.push(plot);
+            this.plantTweens.push(tween);
         }
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants);
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plots);
@@ -536,6 +548,11 @@ export default class MainScene extends Phaser.Scene {
                     plant.setTexture(Assets.Images['Plant' + Math.abs(level)]);
                 } else {
                     plant.setVisible(false);
+                }
+                if (level === State.cardLevels.CardSeed + 2) {
+                    this.plantTweens[i].resume();
+                } else {
+                    this.plantTweens[i].pause();
                 }
             }
 
