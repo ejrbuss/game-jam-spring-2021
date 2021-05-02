@@ -36,7 +36,7 @@ export default class MainScene extends Phaser.Scene {
         background.setDisplaySize(Constants.Width, Constants.Height);
         const moneyBoard = this.add.image(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
         moneyBoard.setScale(0.3 * U);
-        const money = this.add.text(Constants.Width - 150 * U, 16 * U, "0", { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
+        const money = this.add.text(Constants.Width - 150 * U, 16 * U, State.playerMoney, { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
         money.setDisplayOrigin(0, 0);
         this.events.addListener(Constants.Events.EnterPhase, () => {
             const moneyVisible = State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm;
@@ -145,6 +145,7 @@ export default class MainScene extends Phaser.Scene {
 
         // Hand Cards
         this.handCards = {};
+        this.handCardsStars = {};
         for (const key in Cards) {
             this.createHandCard(Cards[key]);
         }
@@ -183,11 +184,16 @@ export default class MainScene extends Phaser.Scene {
         // the player cannot afford them
         const marketCard = this.add.sprite(x, y, card.Image);
         // marketCard.setRotation(rotation);
+
         marketCard.setScale(0.15 * U);
         marketCard.setInteractive();
+
+        const star = this.add.sprite(x, y);
+        star.setScale(0.15 * U);
+
         marketCard.on(Phaser.Input.Events.POINTER_OVER, () => {
             this.add.tween({
-                targets: marketCard,
+                targets: [ marketCard, star ],
                 rotation: 0.1,
                 ease: 'bounce',
                 duration: '500',
@@ -195,14 +201,13 @@ export default class MainScene extends Phaser.Scene {
         });
         marketCard.on(Phaser.Input.Events.POINTER_OUT, () => {
             this.add.tween({
-                targets: marketCard,
+                targets: [ marketCard, star ],
                 rotation: 0,
                 ease: 'bounce',
                 duration: '500',
             });
         });
-        const levelIndicator = this.add.text(x - 30, y - 55, '');
-        levelIndicator.setColor('#000000');
+
         let upgradeButton;
         let buyButton;
         if (card === Cards.CardSeed) {
@@ -217,7 +222,7 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton);
+            this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton);
         }
         else
         {
@@ -245,12 +250,10 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton, buyButton);
+            this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton, buyButton);
         }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
-            // TODO show the card level in a proper manner
-            levelIndicator.setText(`Level ${curLevel + 1}`);
             
             if (curLevel + 1 == card.levels.length) {
                 upgradeButton.setTint(0xff0000);
@@ -273,6 +276,14 @@ export default class MainScene extends Phaser.Scene {
                     upgradeButton.setTint(0xff0000);
                 }
             }
+
+            switch (curLevel) {
+                case 1: star.setTexture(Assets.Images.Star1); break;
+                case 2: star.setTexture(Assets.Images.Star2); break;
+                case 3: star.setTexture(Assets.Images.Star3); break;
+                default: star.setTexture(undefined); break;
+            }
+
         });
         this.events.addListener(Constants.Events.EnterPhase, () => {
             marketCard.clearTint();
@@ -288,9 +299,11 @@ export default class MainScene extends Phaser.Scene {
         const handCard = this.add.sprite(0, Constants.Height + 25 * U, card.Image);
         handCard.setInteractive();
         handCard.setScale(0.15 * U);
+        const star = this.add.sprite(0, Constants.Height + 25 * U);
+        star.setScale(0.15 * U);
         handCard.on(Phaser.Input.Events.POINTER_OVER, () => {
             this.add.tween({
-                targets: handCard,
+                targets: [ handCard, star ],
                 y: Constants.Height - 100 * U,
                 ease: 'Expo',
                 duration: 500,
@@ -298,25 +311,41 @@ export default class MainScene extends Phaser.Scene {
         });
         handCard.on(Phaser.Input.Events.POINTER_OUT, () => {
             this.add.tween({
-                targets: handCard,
+                targets: [ handCard, star ],
                 y: Constants.Height + 25 * U,
                 ease: 'Expo',
                 duration: 500,
             });
         });
         this.handCards[card.Key] = handCard;
+        this.handCardsStars[card.Key] = star;
+        this.events.addListener(Constants.Events.RefreshMarket, () => {
+            let curLevel = State.cardLevels[card.Key];
+            switch (curLevel) {
+                case 1: star.setTexture(Assets.Images.Star1); break;
+                case 2: star.setTexture(Assets.Images.Star2); break;
+                case 3: star.setTexture(Assets.Images.Star3); break;
+                default: star.setTexture(undefined); break;
+            }
+        });
     }
 
     update(time, delta) {
         for (const object in this.handCards) {
             this.handCards[object].setVisible(false);
         }
+        for (const object in this.handCardStars) {
+            this.handCardStars[object].setVisible(false);
+        }
         if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
             let offset = 75 * U;
             for (const card of State.hand) {
                 const handCard = this.handCards[card.Key];
+                const star = this.handCardsStars[card.Key];
                 handCard.setVisible(true);
                 handCard.setX(offset);
+                star.setVisible(true);
+                star.setX(offset);
                 offset += 150 * U;
             }
         }
