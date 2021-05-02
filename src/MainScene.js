@@ -32,12 +32,34 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+        // Do the music
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            // TODO animate blur
+            switch (State.phase) {
+                case Constants.Phases.Start:
+                case Constants.Phases.Market:
+                case Constants.Phases.End:
+                    this.sound.stopAll();
+                    this.sound.play(Assets.Sounds.MarketBackgroundMusic, {
+                        volume: 1,
+                        loop: true,
+                    });
+                    break;
+                case Constants.Phases.Farm:
+                    this.sound.stopAll();
+                    this.sound.play(Assets.Sounds.FarmBackgroundMusic, {
+                        volume: 1,
+                        loop: true,
+                    });
+                    break;
+            }
+        });
         const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
         this.events.addListener(Constants.Events.EnterPhase, () => {
             // TODO animate blur
             switch (State.phase) {
-                case Constants.Phases.Start: background.setTexture(Assets.Images.FarmBackground); break;
-                case Constants.Phases.End: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.Start:
+                case Constants.Phases.End:
                 case Constants.Phases.Market: background.setTexture(Assets.Images.FarmBackground); break;
                 case Constants.Phases.Farm: background.setTexture(Assets.Images.FarmPlotBackground); break;
             }

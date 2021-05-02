@@ -39,6 +39,8 @@ const Assets = {
         Plant5: 'Images/Plant5.png',
     },
     Sounds: {
+        FarmBackgroundMusic: 'Sounds/FarmBackgroundMusic.mp3',
+        MarketBackgroundMusic: 'Sounds/MarketBackgroundMusic.mp3',
     },
     Animations: {
     },
