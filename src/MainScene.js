@@ -188,6 +188,7 @@ export default class MainScene extends Phaser.Scene {
         this.events.addListener(Constants.Events.EnterPhase, () => {
             if (State.phase !== Constants.Phases.Market) { return; }
             // Reset players hand
+            State.plants = State.plants.map(plant => plant === 0 ? 0 : -99);
             State.hand = [
                 Cards.CardSeed,
                 [
