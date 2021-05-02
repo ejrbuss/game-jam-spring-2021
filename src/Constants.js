@@ -4,8 +4,8 @@ const Constants = {
     Unit: 2,//  window.devicePixelRatio,
     FarmingTime: 1000 * 30,
     GrowthChance: 0.01,
-    WiltingChance: 0.85,
-    DryingChance: 0.70,
+    WiltOnGrowthChance: 0.3,
+    DryingChance: 0.007,
     // Game Events
     Events: {
         ExitPhase: 'ExitPhase',
