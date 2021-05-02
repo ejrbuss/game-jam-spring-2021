@@ -789,7 +789,11 @@ export default class MainScene extends Phaser.Scene {
                         State.plants[i] = -level;
                     }
                     // Crows crows crows
-                    if ( (Constants.CrowChance > Math.random())
+                    let crowMultiplier = 1;
+                    if (State.hand.includes(Cards.CardPestilence) && !State.hand.includes(Cards.CardTalisman)) {
+                        crowMultiplier = 2;
+                    }
+                    if ( (Constants.CrowChance * crowMultiplier > Math.random())
                         && (this.crows[i].dead)
                         && (State.plants[i] !== 0)
                     ) {
