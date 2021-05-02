@@ -222,6 +222,11 @@ export default class MainScene extends Phaser.Scene {
             target.setY(target.y - Constants.Height);
         }
         this.events.addListener(Constants.Events.EnterPhase, () => {
+            if (State.phase === Constants.Phases.Farm || State.phase === Constants.Phases.Market) {
+                this.sound.play(Assets.Sounds.BoardFall, {
+                    volume: 2,
+                });
+            }
             if (State.phase !== Constants.Phases.Market) { return; }
             for (const target of this.marketAnimated) {
                 this.add.tween({
