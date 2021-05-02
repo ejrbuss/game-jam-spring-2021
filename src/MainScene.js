@@ -191,7 +191,7 @@ export default class MainScene extends Phaser.Scene {
                     this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
                     if (level === State.cardLevels.CardSeed + 2) {
-                        for (let x = 0; x < Math.pow(2, level - 2); x++) {
+                        for (let x = 0; x < Math.pow(2, level - 1); x++) {
                             const xOffset = (Math.random() * 2 - 1) * 200;
                             const yOffset = (Math.random() * 2 - 1) * 200;
                             this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
