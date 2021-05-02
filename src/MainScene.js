@@ -122,12 +122,18 @@ export default class MainScene extends Phaser.Scene {
                     State.plants[i] = -1;
                 }
                 // Water
-                if (level === -1) {
-                    this.sound.play(Assets.Sounds.Water);
-                    State.plants[i] = -level;
+                else if (level <= 0) {
+                    // Handle wilted case
+                    if (level === -99) {
+                        this.sound.play(Assets.Sounds.Sow);
+                        State.plants[i] = 0;
+                    } else {
+                        this.sound.play(Assets.Sounds.Water);
+                        State.plants[i] = -level;
+                    }
                 }
                 // Harvest
-                if (level === State.cardLevels.CardSeed + 2) {
+                else if (level === State.cardLevels.CardSeed + 2) {
                     this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
                     this.events.emit(Constants.Events.RefreshMoney);
@@ -138,7 +144,7 @@ export default class MainScene extends Phaser.Scene {
                     }
                 }
                 // Clean wilted
-                if (level === -99) {
+                else if (level === -99) {
                     this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
                 }
@@ -542,7 +548,7 @@ export default class MainScene extends Phaser.Scene {
                 const plant = this.plants[i];
                 const plot = this.plots[i];
                 const level = State.plants[i];
-                if (level === -1) {
+                if (level <= 0) {
                     plot.setTexture(Assets.Images.PlotDry);
                 } else {
                     plot.setTexture(Assets.Images.PlotWet);
