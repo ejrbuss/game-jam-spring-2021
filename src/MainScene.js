@@ -124,22 +124,25 @@ export default class MainScene extends Phaser.Scene {
                 }
                 // Sprinkler
                 if (State.hand.includes(Cards.CardSprinkler)) {
-                    if (State.plants[i] < 0) {
-                        // Handle wilted case
-                        if (State.plants[i] === -99) {
-                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plotBoxes);
-                            for (const plotBox of returns) {
-                                if (State.plants[this.plotBoxes.indexOf(plotBox)] === -99) {
-                                    plotBox.setVisible(true);
-                                }
+                    if (State.plants[i] < 0 && State.plants[i] !== -99) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plotBoxes);
+                        for (const plotBox of returns) {
+                            if (State.plants[this.plotBoxes.indexOf(plotBox)] < 0
+                                && State.plants[this.plotBoxes.indexOf(plotBox)] !== -99) {
+                                plotBox.setVisible(true);
                             }
-                        } else {
-                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plotBoxes);
-                            for (const plotBox of returns) {
-                                if (State.plants[this.plotBoxes.indexOf(plotBox)] < 0
-                                 && State.plants[this.plotBoxes.indexOf(plotBox)] !== -99) {
-                                    plotBox.setVisible(true);
-                                }
+                        }
+                    }
+                }
+                // Tractor
+                if (State.hand.includes(Cards.CardTractor)) {
+                    if ((State.plants[i] === State.cardLevels.CardSeed + 2)
+                     || (State.plants[i] === -99)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardTractor.Key], i, this.plotBoxes);
+                        for (const plotBox of returns) {
+                            if ((State.plants[this.plotBoxes.indexOf(plotBox)] === State.cardLevels.CardSeed + 2)
+                             || (State.plants[this.plotBoxes.indexOf(plotBox)] === -99)) {
+                                plotBox.setVisible(true);
                             }
                         }
                     }
@@ -168,47 +171,47 @@ export default class MainScene extends Phaser.Scene {
                     }
                 }
                 // Water
-                else if (level <= 0) {
-                    // Handle wilted case
-                    if (level === -99) {
-                        this.sound.play(Assets.Sounds.Sow);
-                        State.plants[i] = 0;
-                        if (State.hand.includes(Cards.CardSprinkler)) {
-                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plots);
-                            for (const plot of returns) {
-                                if (State.plants[this.plots.indexOf(plot)] === -99) {
-                                    State.plants[this.plots.indexOf(plot)] = 0;
-                                }
-                            }
-                        }
-                    } else {
-                        this.sound.play(Assets.Sounds.Water);
-                        State.plants[i] = -level;
-                        if (State.hand.includes(Cards.CardSprinkler)) {
-                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plots);
-                            for (const plot of returns) {
-                                if (State.plants[this.plots.indexOf(plot)] <= 0) {
-                                    State.plants[this.plots.indexOf(plot)] = -State.plants[this.plots.indexOf(plot)];
-                                }
+                else if (level <= 0 && level !== -99) {
+                    this.sound.play(Assets.Sounds.Water);
+                    State.plants[i] = -level;
+                    if (State.hand.includes(Cards.CardSprinkler)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plots);
+                        for (const plot of returns) {
+                            if (State.plants[this.plots.indexOf(plot)] <= 0) {
+                                State.plants[this.plots.indexOf(plot)] = -State.plants[this.plots.indexOf(plot)];
                             }
                         }
                     }
                 }
                 // Harvest
-                else if (level === State.cardLevels.CardSeed + 2) {
+                else if ((level === State.cardLevels.CardSeed + 2)
+                      || (level === -99)) {
                     this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
-                    this.events.emit(Constants.Events.RefreshMoney);
-                    for (let x = 0; x < Math.pow(2, level - 2); x++) {
-                        const xOffset = (Math.random() * 2 - 1) * 200;
-                        const yOffset = (Math.random() * 2 - 1) * 200;
-                        this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
+                    if (level === State.cardLevels.CardSeed + 2) {
+                        for (let x = 0; x < Math.pow(2, level - 2); x++) {
+                            const xOffset = (Math.random() * 2 - 1) * 200;
+                            const yOffset = (Math.random() * 2 - 1) * 200;
+                            this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
+                        }
                     }
-                }
-                // Clean wilted
-                else if (level === -99) {
-                    this.sound.play(Assets.Sounds.HarvestClick);
-                    State.plants[i] = 0;
+                    if (State.hand.includes(Cards.CardTractor)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardTractor.Key], i, this.plots);
+                        for (const plot of returns) {
+                            if ((State.plants[this.plots.indexOf(plot)] === State.cardLevels.CardSeed + 2)
+                             || (State.plants[this.plots.indexOf(plot)] === -99)) {
+                                State.plants[this.plots.indexOf(plot)] = 0;
+                                if (State.plants[this.plots.indexOf(plot)] === State.cardLevels.CardSeed + 2) {
+                                    for (let x = 0; x < Math.pow(2, State.plants[this.plots.indexOf(plot)] - 2); x++) {
+                                        const xOffset = (Math.random() * 2 - 1) * 200;
+                                        const yOffset = (Math.random() * 2 - 1) * 200;
+                                        this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    this.events.emit(Constants.Events.RefreshMoney);
                 }
             });
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
@@ -698,7 +701,7 @@ export default class MainScene extends Phaser.Scene {
                 } else {
                     plot.setTexture(Assets.Images.PlotWet);
                 }
-                if (level == -99) {
+                if (level === -99) {
                     plant.setVisible(true);
                     plant.setTexture(Assets.Images['PlantWilted']);
                 } else if (level !== 0) {
