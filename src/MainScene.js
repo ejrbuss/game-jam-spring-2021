@@ -189,9 +189,9 @@ export default class MainScene extends Phaser.Scene {
                     this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
                     this.events.emit(Constants.Events.RefreshMoney);
-                    for (let x = -1; x < level; x++) {
-                        const xOffset = (Math.random() * 2 - 1) * 100;
-                        const yOffset = (Math.random() * 2 - 1) * 100;
+                    for (let x = 0; x < Math.pow(2, level - 2); x++) {
+                        const xOffset = (Math.random() * 2 - 1) * 200;
+                        const yOffset = (Math.random() * 2 - 1) * 200;
                         this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
                     }
                 }
@@ -229,7 +229,7 @@ export default class MainScene extends Phaser.Scene {
 
     handleCornCollision(sign, corn) {
         corn.destroy();
-        State.playerMoney += 20;
+        State.playerMoney++;
         this.events.emit(Constants.Events.RefreshMoney);
         this.sound.play(Assets.Sounds.HarvestGain, {
             volume: 1
