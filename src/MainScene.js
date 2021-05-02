@@ -73,13 +73,13 @@ export default class MainScene extends Phaser.Scene {
         const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
         this.visibleDuringPhase(Constants.Phases.Market, marketBoard);
 
-        this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 50, Cards.CardCow);
-        this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 50, Cards.CardScarecrow);
-        this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 50, Cards.CardTalisman);
-        this.createMarketCard(Constants.Width / 4, Constants.Height / 4 + 250, Cards.CardOveralls);
+        this.createMarketCard(Constants.Width / 4,       Constants.Height / 4 + 50,  Cards.CardCow);
+        this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 50,  Cards.CardScarecrow);
+        this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 50,  Cards.CardTalisman);
+        this.createMarketCard(Constants.Width / 4,       Constants.Height / 4 + 250, Cards.CardOveralls);
         this.createMarketCard(Constants.Width / 4 + 120, Constants.Height / 4 + 250, Cards.CardSprinkler);
         this.createMarketCard(Constants.Width / 4 + 240, Constants.Height / 4 + 250, Cards.CardTractor);
-        this.createMarketCard(Constants.Width / 4 + 450, Constants.Height / 4 + 50, Cards.CardSeed, true);
+        this.createMarketCard(Constants.Width / 4 + 450, Constants.Height / 4 + 50,  Cards.CardSeed);
 
         // Farm plots
         this.plants= [];
@@ -183,30 +183,55 @@ export default class MainScene extends Phaser.Scene {
         marketCard.setRotation(rotation);
         const levelIndicator = this.add.text(x - 30, y - 55, '');
         levelIndicator.setColor('#000000');
-        const upgradeButton = this.createButton(x - 30, y + 100, Assets.Images.UpgradeButton, () => {
-            State.cardLevels[card.Key] += 1;
-            this.events.emit(Constants.Events.RefreshMarket);
-        });
-        const buyButton = this.createButton(x + 30, y + 100, Assets.Images.BuyButton, () => { 
-            // TODO subtract player cash and update the other buy/upgrade states
-            State.hand.push(card);
-            // TODO create a prettier indication that the card has been bought
-            // Eg. a SOLD sign over the card
-            marketCard.setTint(0xff0000);
-            buyButton.setVisible(false);
-            if (State.hand.length === 5) {
-                this.gotoPhase(Constants.Phases.Farm);
-            }
-        });
-        this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton, buyButton);
+        let upgradeButton;
+        let buyButton;
+        if (card === Cards.CardSeed) {
+            upgradeButton = this.createButton(x, y + 100, Assets.Images.UpgradeButton, () => {
+                State.cardLevels[card.Key] += 1;
+                this.events.emit(Constants.Events.RefreshMarket);
+            });
+            this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton);
+        }
+        else
+        {
+            upgradeButton = this.createButton(x - 30, y + 100, Assets.Images.UpgradeButton, () => {
+                let curLevel = State.cardLevels[card.Key];
+                if ( (curLevel + 1 == card.levels.length)                       // the card is max level
+                  || (State.hand.includes(card))                                // the card is already in hand
+                  || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
+                { return; }
+                State.cardLevels[card.Key] += 1;
+                this.events.emit(Constants.Events.RefreshMarket);
+            });
+            buyButton = this.createButton(x + 30, y + 100, Assets.Images.BuyButton, () => { 
+                // TODO subtract player cash and update the other buy/upgrade states
+                if (!State.hand.includes(card)) { State.hand.push(card); }
+                // TODO create a prettier indication that the card has been bought
+                // Eg. a SOLD sign over the card
+                marketCard.setTint(0xff0000);
+                upgradeButton.setTint(0xff0000);
+                buyButton.setTint(0xff0000); // alternatively, setVisible(false)
+                if (State.hand.length === 5) {
+                    this.gotoPhase(Constants.Phases.Farm);
+                }
+            });
+            this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton, buyButton);
+        }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             // TODO show the card level in a proper manner
             levelIndicator.setText(`Level ${State.cardLevels[card.Key] + 1}`);
-            // Show buy button if card is not in hand
-
             // Show upgrade button if card has a higher level
-
-
+            if (State.cardLevels[card.Key] + 1 == card.levels.length) {
+                upgradeButton.setTint(0xff0000); // alternatively, setVisible(false)
+            }
+        });
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            marketCard.clearTint();
+            if (buyButton) { buyButton.clearTint(); }
+            if (State.cardLevels[card.Key] + 1 < card.levels.length) {
+                upgradeButton.clearTint();
+            }
+            this.events.emit(Constants.Events.RefreshMarket);
         });
     }
 
