@@ -202,14 +202,12 @@ export default class MainScene extends Phaser.Scene {
                         for (const plot of returns) {
                             if ((State.plants[this.plots.indexOf(plot)] === State.cardLevels.CardSeed + 2)
                              || (State.plants[this.plots.indexOf(plot)] === -99)) {
-                                State.plants[this.plots.indexOf(plot)] = 0;
                                 if (State.plants[this.plots.indexOf(plot)] === State.cardLevels.CardSeed + 2) {
-                                    for (let x = 0; x < Math.pow(2, State.plants[this.plots.indexOf(plot)] - 2); x++) {
-                                        const xOffset = (Math.random() * 2 - 1) * 200;
-                                        const yOffset = (Math.random() * 2 - 1) * 200;
-                                        this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
-                                    }
+                                    const xOffset = (Math.random() * 2 - 1) * 200;
+                                    const yOffset = (Math.random() * 2 - 1) * 200;
+                                    this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
                                 }
+                                State.plants[this.plots.indexOf(plot)] = 0;
                             }
                         }
                     }
