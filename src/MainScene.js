@@ -146,8 +146,8 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
-            const xPos = x * 75 * U + 175 * U;
-            const yPos = y * 75 * U + 100 * U;
+            const xPos = x * 80 * U + 148 * U;
+            const yPos = y * 80 * U + 78 * U;
             const plot = this.add.sprite(xPos, yPos, Assets.Images.PlotDry);
             const plotBox = this.add.rectangle(xPos, yPos, 70 * U, 70 * U);
             plotBox.setStrokeStyle(2, 0x121200);
@@ -155,7 +155,7 @@ export default class MainScene extends Phaser.Scene {
             plot.setScale(0.08 * U);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
-                plotBox.setVisible(true);                
+                plotBox.setVisible(true);
             });
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
                 plotBox.setVisible(false);
