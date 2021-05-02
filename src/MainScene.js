@@ -793,6 +793,9 @@ export default class MainScene extends Phaser.Scene {
                     if (State.hand.includes(Cards.CardPestilence) && !State.hand.includes(Cards.CardTalisman)) {
                         crowMultiplier = 2;
                     }
+                    if (State.hand.includes(Cards.CardScarecrow)) {
+                        crowMultiplier / State.cardLevels.CardScarecrow + 2;
+                    }
                     if ( (Constants.CrowChance * crowMultiplier > Math.random())
                         && (this.crows[i].dead)
                         && (State.plants[i] !== 0)
