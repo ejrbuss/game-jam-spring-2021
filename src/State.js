@@ -8,7 +8,7 @@ const State = {
     hand: [],
     time: 0,
     lastTick: 0,
-    // Farm plots (magnitude growth phase, -1 needs water, -99 wilted)
+    // Farm plots (magnitude growth phase, negative needs water, -99 wilted)
     plants: [
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
