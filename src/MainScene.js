@@ -345,7 +345,7 @@ export default class MainScene extends Phaser.Scene {
         if (card === Cards.CardSeed) {
             upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
-                if ( (curLevel == card.levels.length)                           // the card is max level
+                if ( (curLevel + 1 >= card.levels.length)                      // the card is max level
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
                 State.playerMoney -= card.levels[curLevel].upgradeCost;
@@ -360,7 +360,7 @@ export default class MainScene extends Phaser.Scene {
         {
             upgradeButton = this.createButton(x - 28 * U, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
-                if ( (curLevel == card.levels.length)                           // the card is max level
+                if ( (curLevel + 1 >= card.levels.length)                           // the card is max level
                   || (State.hand.includes(card))                                // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
@@ -400,6 +400,7 @@ export default class MainScene extends Phaser.Scene {
             marketCard.clearTint();
             marketCard.setTexture(card.Image);
             marketCard.setVisible(true);
+            star.setVisible(true);
             upgradeButton.setTexture(Assets.Images.UpgradeButton);
             upgradeButton.setVisible(true);
             if (buyButton) {
@@ -417,6 +418,7 @@ export default class MainScene extends Phaser.Scene {
                 // TODO create a prettier indication that the card has been bought
                 // Eg. a SOLD sign over the card
                 marketCard.setVisible(false);
+                star.setVisible(false);
                 upgradeButton.setVisible(false);
                 if (buyButton) {
                     buyButton.setVisible(false);
