@@ -281,6 +281,13 @@ export default class MainScene extends Phaser.Scene {
             this.createHandCard(Cards[key]);
         }
 
+        const blackScreen = this.add.rectangle(Constants.Width / 2, Constants.Height / 2, Constants.Width, Constants.Height, 0x0);
+        this.add.tween({
+            targets: blackScreen,
+            duration: 500,
+            ease: 'sine',
+            alpha: 0,
+        });
         this.gotoPhase(Constants.Phases.Start);
     }
 
