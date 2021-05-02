@@ -62,6 +62,8 @@ const Assets = {
         SeasonWheelArrow: 'Images/SeasonWheelArrow.png',
 
         Corn: 'Images/corn.png',
+        Crow: 'Images/crow.png',
+        CrowDead: 'Images/CrowDead.png'
     },
     Sounds: {
         FarmBackgroundMusic: 'Sounds/FarmBackgroundMusic.mp3',
@@ -74,6 +76,7 @@ const Assets = {
         CrowSoundsCall3: 'Sounds/crowSounds-call3.mp3',
         CrowSoundsCall4: 'Sounds/crowSounds-call4.mp3',
         CrowSoundsPeck: 'Sounds/crowSounds-peck.mp3',
+        CrowSoundsDeath: 'Sounds/crowSounds-death1.mp3',
         HarvestClick: 'Sounds/harvest-click.mp3', 
         HarvestGain: 'Sounds/harvest-gain.mp3',
         Sow: 'Sounds/sow.mp3',

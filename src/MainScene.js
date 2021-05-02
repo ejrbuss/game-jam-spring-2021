@@ -98,6 +98,7 @@ export default class MainScene extends Phaser.Scene {
         this.plots = [];
         this.plantTweens = [];
         this.plotBoxes = [];
+        this.crows = [];
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
@@ -239,8 +240,38 @@ export default class MainScene extends Phaser.Scene {
             this.plantTweens.push(tween);
             this.plotBoxes.push(plotBox);
         }
-        this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants);
-        this.visibleDuringPhase(Constants.Phases.Farm, ...this.plots);
+        for (let i = 0; i < State.plants.length; i++) {
+            const x = i % State.plotsWidth;
+            const y = Math.floor(i / State.plotsWidth);
+            const xPos = x * 80 * U + 148 * U;
+            const yPos = y * 80 * U + 78 * U;
+            const crow = this.add.sprite(xPos, yPos, Assets.Images.Crow);
+            crow.dead = true;
+            crow.xPos = xPos;
+            crow.setInteractive();
+            crow.setScale(0.15);
+            crow.setVisible(false);
+            crow.on(Phaser.Input.Events.POINTER_DOWN, () => {
+                this.sound.play(Assets.Sounds.CrowSoundsDeath);
+                crow.setTexture(Assets.Images.CrowDead);
+                this.add.tween({
+                    targets: crow,
+                    alpha: 0,
+                    scale: 0.2,
+                    duration: 250,
+                });
+                crow.dead = true;
+            });
+            this.crows.push(crow);
+        }
+        this.events.addListener(Constants.Events.ExitPhase, () => {
+            if (State.phase !== Constants.Phases.Farm) { return; }
+            for (const crow of this.crows) {
+                crow.dead = true;
+                crow.setVisible(false);
+            }
+        });
+        this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants, ...this.plots);
         this.events.addListener(Constants.Events.EnterPhase, () => {
             if (State.phase !== Constants.Phases.Farm) { return; }
             State.time = 0;
@@ -349,11 +380,27 @@ export default class MainScene extends Phaser.Scene {
         }
 
         const blackScreen = this.add.rectangle(Constants.Width / 2, Constants.Height / 2, Constants.Width, Constants.Height, 0x0);
+        const introText = this.add.text(105 * U, Constants.Height / 2 - 10 * U, "Earn $1000 clicking the cobs and achieve your dreams!", { fontFamily: 'Nunito-Light', fontSize: 32 * U });
+        introText.setAlpha(0);
         this.add.tween({
-            targets: blackScreen,
+            targets: [introText],
+            duration: 500,
+            ease: 'sine',
+            alpha: 1,
+        });
+        this.add.tween({
+            targets: [introText],
             duration: 500,
             ease: 'sine',
             alpha: 0,
+            delay: 2000,
+        })
+        this.add.tween({
+            targets: [introText, blackScreen],
+            duration: 500,
+            ease: 'sine',
+            alpha: 0,
+            delay: 2500,
         });
         this.gotoPhase(Constants.Phases.Start);
     }
@@ -760,7 +807,51 @@ export default class MainScene extends Phaser.Scene {
                       && (Constants.DryingChance > Math.random()) ) {
                         State.plants[i] = -level;
                     }
-
+                    // Crows crows crows
+                    let crowMultiplier = 1;
+                    if (State.hand.includes(Cards.CardPestilence) && !State.hand.includes(Cards.CardTalisman)) {
+                        crowMultiplier = 2;
+                    }
+                    if (State.hand.includes(Cards.CardScarecrow)) {
+                        crowMultiplier / State.cardLevels.CardScarecrow + 2;
+                    }
+                    if ( (Constants.CrowChance * crowMultiplier > Math.random())
+                        && (this.crows[i].dead)
+                        && (State.plants[i] !== 0)
+                    ) {
+                        this.sound.play([
+                            Assets.Sounds.CrowSoundsCall1,
+                            Assets.Sounds.CrowSoundsCall2,
+                            Assets.Sounds.CrowSoundsCall3,
+                            Assets.Sounds.CrowSoundsCall4,
+                        ][Phaser.Math.Between(0, 3)], { volume: 0.25 });
+                        const crow = this.crows[i];
+                        crow.dead = false;
+                        crow.setVisible(true);
+                        crow.setAlpha(1.0);
+                        crow.setTexture(Assets.Images.Crow);
+                        crow.setScale(0.15);
+                        const sign = (Math.random() > 0.5) ? -1 : 1;
+                        crow.setX(sign === -1 ? 0 : Constants.Width);
+                        crow.setRotation(sign === -1 ?  Math.PI : 0);
+                        this.add.tween({
+                            targets: crow,
+                            duration: 3000,
+                            x: crow.xPos,
+                            ease: 'linear',
+                        });
+                        setTimeout(() => {
+                            if (!crow.dead) {
+                                crow.dead = true;
+                                this.add.tween({
+                                    targets: crow,
+                                    time: 1000,
+                                    x: -sign === -1 ? -Constants.Width : Constants.Width * 2,
+                                });
+                                State.plants[i] = 0;
+                            }
+                        }, 3000);
+                    }
                 }
                 State.lastTick = State.lastTick + 100;
             }
