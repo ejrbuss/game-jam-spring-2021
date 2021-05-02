@@ -61,10 +61,10 @@ export default class MainScene extends Phaser.Scene {
                 case Constants.Phases.Start: background.setTexture(Assets.Images.FarmTitleBackground); break;
                 case Constants.Phases.End:
                 case Constants.Phases.Market: background.setTexture(Assets.Images.FarmBackground); break;
-                case Constants.Phases.Farm: background.setTexture(Assets.Images.FarmPlotBackground); break;
             }
         });
         background.setDisplaySize(Constants.Width, Constants.Height);
+        this.background = background;
         const cornGroup = this.physics.add.group();
         const moneyBoard = this.physics.add.staticSprite(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
         this.physics.add.collider(cornGroup, moneyBoard, (...args) => {this.handleCornCollision(...args)});
@@ -562,6 +562,17 @@ export default class MainScene extends Phaser.Scene {
             } else if (State.time - State.lastTick > 100) {
 
                 let newRotation = State.time / Constants.FarmingTime;
+                
+                if (newRotation < 0.25) {
+                    this.background.setTexture(Assets.Images.FarmBackgroundSpring);
+                } else if (newRotation < 0.5) {
+                    this.background.setTexture(Assets.Images.FarmBackgroundSummer);
+                } else if (newRotation < 0.75) {
+                    this.background.setTexture(Assets.Images.FarmBackgroundFall);
+                } else {
+                    this.background.setTexture(Assets.Images.FarmBackgroundWinter);
+                }
+                
                 newRotation = newRotation * Math.PI * 2 * -1; // -1 to rotate counterclockwise
                 this.seasonWheel.setRotation(newRotation);
 
