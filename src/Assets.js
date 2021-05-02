@@ -43,7 +43,7 @@ const Assets = {
         PlotDry: 'Images/PlotDry.png',
         PlotWet: 'Images/PlotWet.png',
 
-        PlantWilted: 'PlantWilted.png',
+        PlantWilted: 'Images/PlantWilted.png',
 
         Plant1: 'Images/Plant1.png',
         Plant2: 'Images/Plant2.png',

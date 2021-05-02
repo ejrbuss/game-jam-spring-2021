@@ -122,7 +122,7 @@ export default class MainScene extends Phaser.Scene {
                     State.plants[i] = -1;
                 }
                 // Water
-                if (level < 0) {
+                if (level === -1) {
                     this.sound.play(Assets.Sounds.Water);
                     State.plants[i] = -level;
                 }
@@ -136,6 +136,11 @@ export default class MainScene extends Phaser.Scene {
                         const yOffset = (Math.random() * 2 - 1) * 200;
                         this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
                     }
+                }
+                // Clean wilted
+                if (level === -99) {
+                    this.sound.play(Assets.Sounds.HarvestClick);
+                    State.plants[i] = 0;
                 }
             });
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
@@ -532,18 +537,20 @@ export default class MainScene extends Phaser.Scene {
             }
         }
         if (State.phase === Constants.Phases.Farm) {
-            // TODO update plant plots
             // Update plant images
             for (const i in State.plants) {
                 const plant = this.plants[i];
                 const plot = this.plots[i];
                 const level = State.plants[i];
-                if (level <= 0) {
+                if (level === -1) {
                     plot.setTexture(Assets.Images.PlotDry);
                 } else {
                     plot.setTexture(Assets.Images.PlotWet);
                 }
-                if (level !== 0) {
+                if (level == -99) {
+                    plant.setVisible(true);
+                    plant.setTexture(Assets.Images['PlantWilted']);
+                } else if (level !== 0) {
                     plant.setVisible(true);
                     plant.setTexture(Assets.Images['Plant' + Math.abs(level)]);
                 } else {
@@ -579,8 +586,14 @@ export default class MainScene extends Phaser.Scene {
                 const i = Phaser.Math.Between(0, State.plants.length);
                 const level = State.plants[i];
                 if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
-                    if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
-                        State.plants[i] += 1;
+                    if ( (State.hand.includes(Cards.CardPlague))
+                      && (Math.random() > Constants.WiltingChance) )
+                    {
+                        State.plants[i] = -99;
+                    } else {
+                        if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
+                            State.plants[i] += 1;
+                        }
                     }
                 }
                 State.lastTick = State.lastTick + 100;
