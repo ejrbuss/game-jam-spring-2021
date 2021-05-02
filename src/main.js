@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import CreditsScene from './CreditsScene';
 import Constants from './Constants';
 import MainScene from './MainScene';
 
@@ -7,7 +8,7 @@ const Game = new Phaser.Game({
     width: Constants.Width,
     height: Constants.Height,
     canvasStyle: 'margin: auto; display: block; width: 1280; height: 720; border-radius: 30px;',
-    scene: MainScene,
+    scene: [MainScene, CreditsScene],
     antialias: true,
     physics: {
         default: 'arcade',

@@ -512,7 +512,7 @@ export default class MainScene extends Phaser.Scene {
                 buyButton.setTexture(Assets.Images.BuyButton);
                 buyButton.setVisible(true);
             }
-            if (curLevel == card.levels.length) {
+            if (curLevel + 1 == card.levels.length) {
                 upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
             }
             if (card === State.cursedCard) {
@@ -609,8 +609,12 @@ export default class MainScene extends Phaser.Scene {
         for (const object in this.handCards) {
             this.handCards[object].setVisible(false);
         }
-        for (const object in this.handCardStars) {
-            this.handCardStars[object].setVisible(false);
+        for (const object in this.handCardsStars) {
+            this.handCardsStars[object].setVisible(false);
+        }
+        if (State.playerMoney >= 1000) {
+            console.log('YOU WIN!');
+            this.scene.start('CreditsScene');
         }
         if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
             let offset = 75 * U;
@@ -671,21 +675,27 @@ export default class MainScene extends Phaser.Scene {
                 newRotation = newRotation * Math.PI * 2 * -1; // -1 to rotate counterclockwise
                 this.seasonWheel.setRotation(newRotation);
 
-                const i = Phaser.Math.Between(0, State.plants.length);
-                const level = State.plants[i];
-                if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
-                    if ( (State.hand.includes(Cards.CardPlague))
-                      && (Math.random() > Constants.WiltingChance) )
-                    {
-                        State.plants[i] = -99;
-                    } else {
-                        if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
-                            State.plants[i] += 1;
+                for (let i = 0; i < State.plants.length; i++) {
+                    const level = State.plants[i];
+                    let cowMultiplier = 1;
+                    if (State.hand.includes(Cards.CardCow)) {
+                        cowMultiplier = [ 2.0, 4.0, 8.0, 16.0 ][State.cardLevels.CardCow];
+                    }
+                    if (level > 0 && level <= 4 && Constants.GrowthChance * cowMultiplier > Math.random()) {
+                        if ( (State.hand.includes(Cards.CardPlague))
+                            && (!State.hand.includes(Cards.CardTalisman))
+                            && (Constants.WiltOnGrowthChance > Math.random()) ) {
+                            State.plants[i] = -99;
+                        } else {
+                            if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
+                                State.plants[i] += 1;
+                            }
                         }
                     }
                     if ( (State.hand.includes(Cards.CardDrought))
-                      && (level !== State.cardLevels.CardSeed + 2)
-                      && (Math.random() > Constants.DryingChance) ) {
+                      && (!State.hand.includes(Cards.CardTalisman))
+                      && (level > 0)
+                      && (Constants.DryingChance > Math.random()) ) {
                         State.plants[i] = -level;
                     }
 

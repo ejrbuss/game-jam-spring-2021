@@ -9,6 +9,8 @@ const Assets = {
         FarmBackgroundWinter: 'Images/FarmBackgroundWinter.png',
         MarketBackground: 'Images/MarketBackground.png',
         MoneyBoard: 'Images/MoneyBoard.png',
+        Space: 'Images/space.png',
+        SpaceCorn: 'Images/spaceCorn.png',
 
         StartButton: 'Images/StartButton.png',
         UpgradeButton: 'Images/UpgradeButton.png',
