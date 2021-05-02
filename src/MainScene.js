@@ -111,8 +111,9 @@ export default class MainScene extends Phaser.Scene {
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);
-                if (State.plants[i] === 0) {
-                    if (State.hand.includes(Cards.CardOveralls)) {
+                // Overalls
+                if (State.hand.includes(Cards.CardOveralls)) {
+                    if (State.plants[i] === 0) {
                         const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
                         for (const plotBox of returns) {
                             if (State.plants[this.plotBoxes.indexOf(plotBox)] === 0) {
@@ -121,14 +122,34 @@ export default class MainScene extends Phaser.Scene {
                         }
                     }
                 }
+                // Sprinkler
+                if (State.hand.includes(Cards.CardSprinkler)) {
+                    if (State.plants[i] < 0) {
+                        // Handle wilted case
+                        if (State.plants[i] === -99) {
+                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plotBoxes);
+                            for (const plotBox of returns) {
+                                if (State.plants[this.plotBoxes.indexOf(plotBox)] === -99) {
+                                    plotBox.setVisible(true);
+                                }
+                            }
+                        } else {
+                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plotBoxes);
+                            for (const plotBox of returns) {
+                                if (State.plants[this.plotBoxes.indexOf(plotBox)] < 0
+                                 && State.plants[this.plotBoxes.indexOf(plotBox)] !== -99) {
+                                    plotBox.setVisible(true);
+                                }
+                            }
+                        }
+                    }
+                }
             });
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
                 plotBox.setVisible(false);
-                if (State.hand.includes(Cards.CardOveralls)) {
-                    const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
-                    for (const plotBox of returns) {
-                        plotBox.setVisible(false);
-                    }
+                const returns = this.AOEgetThings(2, i, this.plotBoxes);
+                for (const plotBox of returns) {
+                    plotBox.setVisible(false);
                 }
             });
             plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
@@ -152,9 +173,25 @@ export default class MainScene extends Phaser.Scene {
                     if (level === -99) {
                         this.sound.play(Assets.Sounds.Sow);
                         State.plants[i] = 0;
+                        if (State.hand.includes(Cards.CardSprinkler)) {
+                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plots);
+                            for (const plot of returns) {
+                                if (State.plants[this.plots.indexOf(plot)] === -99) {
+                                    State.plants[this.plots.indexOf(plot)] = 0;
+                                }
+                            }
+                        }
                     } else {
                         this.sound.play(Assets.Sounds.Water);
                         State.plants[i] = -level;
+                        if (State.hand.includes(Cards.CardSprinkler)) {
+                            const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plots);
+                            for (const plot of returns) {
+                                if (State.plants[this.plots.indexOf(plot)] <= 0) {
+                                    State.plants[this.plots.indexOf(plot)] = -State.plants[this.plots.indexOf(plot)];
+                                }
+                            }
+                        }
                     }
                 }
                 // Harvest
