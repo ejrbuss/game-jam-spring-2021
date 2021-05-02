@@ -354,7 +354,6 @@ export default class MainScene extends Phaser.Scene {
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
             // TODO show the card level in a proper manner
-            levelIndicator.setText(`Level ${curLevel + 1}`);
             // clear tints and then we're gonna reapply them
             marketCard.clearTint();
             upgradeButton.clearTint();
@@ -363,7 +362,6 @@ export default class MainScene extends Phaser.Scene {
                 upgradeButton.setTint(0xff0000);
             }
             if (card === State.cursedCard) {
-                console.log('here, card is ', card);
                 marketCard.setTint(0xff00ff);
             }
             if ( (card != Cards.CardSeed)
