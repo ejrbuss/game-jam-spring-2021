@@ -125,11 +125,11 @@ export default class MainScene extends Phaser.Scene {
                 }
                 // Sprinkler
                 if (State.hand.includes(Cards.CardSprinkler)) {
-                    if (State.plants[i] < 0 && State.plants[i] !== -99) {
+                    if ((State.plants[i] <= 0) && (State.plants[i] !== -99)) {
                         const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plotBoxes);
                         for (const plotBox of returns) {
-                            if (State.plants[this.plotBoxes.indexOf(plotBox)] < 0
-                                && State.plants[this.plotBoxes.indexOf(plotBox)] !== -99) {
+                            if ((State.plants[this.plotBoxes.indexOf(plotBox)] <= 0)
+                             && (State.plants[this.plotBoxes.indexOf(plotBox)] !== -99)) {
                                 plotBox.setVisible(true);
                             }
                         }
@@ -172,13 +172,14 @@ export default class MainScene extends Phaser.Scene {
                     }
                 }
                 // Water
-                else if (level <= 0 && level !== -99) {
+                else if ((level <= 0) && (level !== -99)) {
                     this.sound.play(Assets.Sounds.Water);
                     State.plants[i] = -level;
                     if (State.hand.includes(Cards.CardSprinkler)) {
                         const returns = this.AOEgetThings(State.cardLevels[Cards.CardSprinkler.Key], i, this.plots);
                         for (const plot of returns) {
-                            if (State.plants[this.plots.indexOf(plot)] <= 0) {
+                            if ((State.plants[this.plots.indexOf(plot)] <= 0)
+                             && (State.plants[this.plots.indexOf(plot)] !== -99)) {
                                 State.plants[this.plots.indexOf(plot)] = -State.plants[this.plots.indexOf(plot)];
                             }
                         }
