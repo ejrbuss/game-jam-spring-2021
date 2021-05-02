@@ -61,10 +61,10 @@ export default class MainScene extends Phaser.Scene {
                 case Constants.Phases.Start: background.setTexture(Assets.Images.FarmTitleBackground); break;
                 case Constants.Phases.End:
                 case Constants.Phases.Market: background.setTexture(Assets.Images.FarmBackground); break;
-                case Constants.Phases.Farm: background.setTexture(Assets.Images.FarmPlotBackground); break;
             }
         });
         background.setDisplaySize(Constants.Width, Constants.Height);
+        this.background = background;
         const cornGroup = this.physics.add.group();
         const moneyBoard = this.physics.add.staticSprite(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
         this.physics.add.collider(cornGroup, moneyBoard, (...args) => {this.handleCornCollision(...args)});
@@ -96,15 +96,16 @@ export default class MainScene extends Phaser.Scene {
         // Farm plots
         this.plants= [];
         this.plots = [];
+        this.plantTweens = [];
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
             const xPos = x * 80 * U + 148 * U;
             const yPos = y * 80 * U + 78 * U;
             const plot = this.add.sprite(xPos, yPos, Assets.Images.PlotDry);
-            const plotBox = this.add.rectangle(xPos, yPos, 70 * U, 70 * U);
-            plotBox.setStrokeStyle(2, 0x121200);
+            const plotBox = this.add.sprite(xPos, yPos, Assets.Images.SelectionSquare);
             plotBox.setVisible(false);
+            plotBox.setScale(0.3);
             plot.setScale(0.08 * U);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
@@ -121,12 +122,18 @@ export default class MainScene extends Phaser.Scene {
                     State.plants[i] = -1;
                 }
                 // Water
-                if (level < 0) {
-                    this.sound.play(Assets.Sounds.Water);
-                    State.plants[i] = -level;
+                else if (level <= 0) {
+                    // Handle wilted case
+                    if (level === -99) {
+                        this.sound.play(Assets.Sounds.Sow);
+                        State.plants[i] = 0;
+                    } else {
+                        this.sound.play(Assets.Sounds.Water);
+                        State.plants[i] = -level;
+                    }
                 }
                 // Harvest
-                if (level === State.cardLevels.CardSeed + 2) {
+                else if (level === State.cardLevels.CardSeed + 2) {
                     this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
                     this.events.emit(Constants.Events.RefreshMoney);
@@ -135,6 +142,11 @@ export default class MainScene extends Phaser.Scene {
                         const yOffset = (Math.random() * 2 - 1) * 200;
                         this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
                     }
+                }
+                // Clean wilted
+                else if (level === -99) {
+                    this.sound.play(Assets.Sounds.HarvestClick);
+                    State.plants[i] = 0;
                 }
             });
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
@@ -147,8 +159,19 @@ export default class MainScene extends Phaser.Scene {
                 Assets.Images.Plant1,
             );
             plant.setScale(0.075 * U);
+            const tween = this.add.tween({
+                targets: plant,
+                rotation: 0.1,
+                duration: 250,
+                ease: 'sine',
+                loop: true,
+                repeat: -1,
+                yoyo: true,
+                delay: Math.random() * 500,
+            })
             this.plants.push(plant);
             this.plots.push(plot);
+            this.plantTweens.push(tween);
         }
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plants);
         this.visibleDuringPhase(Constants.Phases.Farm, ...this.plots);
@@ -165,6 +188,7 @@ export default class MainScene extends Phaser.Scene {
         this.events.addListener(Constants.Events.EnterPhase, () => {
             if (State.phase !== Constants.Phases.Market) { return; }
             // Reset players hand
+            State.plants = State.plants.map(plant => plant === 0 ? 0 : -99);
             State.hand = [
                 Cards.CardSeed,
                 [
@@ -257,6 +281,13 @@ export default class MainScene extends Phaser.Scene {
             this.createHandCard(Cards[key]);
         }
 
+        const blackScreen = this.add.rectangle(Constants.Width / 2, Constants.Height / 2, Constants.Width, Constants.Height, 0x0);
+        this.add.tween({
+            targets: blackScreen,
+            duration: 500,
+            ease: 'sine',
+            alpha: 0,
+        });
         this.gotoPhase(Constants.Phases.Start);
     }
 
@@ -345,7 +376,7 @@ export default class MainScene extends Phaser.Scene {
         if (card === Cards.CardSeed) {
             upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
-                if ( (curLevel == card.levels.length)                           // the card is max level
+                if ( (curLevel + 1 >= card.levels.length)                      // the card is max level
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
                 State.playerMoney -= card.levels[curLevel].upgradeCost;
@@ -360,7 +391,7 @@ export default class MainScene extends Phaser.Scene {
         {
             upgradeButton = this.createButton(x - 28 * U, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
-                if ( (curLevel == card.levels.length)                           // the card is max level
+                if ( (curLevel + 1 >= card.levels.length)                           // the card is max level
                   || (State.hand.includes(card))                                // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
@@ -400,13 +431,14 @@ export default class MainScene extends Phaser.Scene {
             marketCard.clearTint();
             marketCard.setTexture(card.Image);
             marketCard.setVisible(true);
+            star.setVisible(true);
             upgradeButton.setTexture(Assets.Images.UpgradeButton);
             upgradeButton.setVisible(true);
             if (buyButton) {
                 buyButton.setTexture(Assets.Images.BuyButton);
                 buyButton.setVisible(true);
             }
-            if (curLevel == card.levels.length) {
+            if (curLevel + 1 == card.levels.length) {
                 upgradeButton.setTexture(Assets.Images.UpgradeButtonDisabled);
             }
             if (card === State.cursedCard) {
@@ -417,6 +449,7 @@ export default class MainScene extends Phaser.Scene {
                 // TODO create a prettier indication that the card has been bought
                 // Eg. a SOLD sign over the card
                 marketCard.setVisible(false);
+                star.setVisible(false);
                 upgradeButton.setVisible(false);
                 if (buyButton) {
                     buyButton.setVisible(false);
@@ -502,8 +535,8 @@ export default class MainScene extends Phaser.Scene {
         for (const object in this.handCards) {
             this.handCards[object].setVisible(false);
         }
-        for (const object in this.handCardStars) {
-            this.handCardStars[object].setVisible(false);
+        for (const object in this.handCardsStars) {
+            this.handCardsStars[object].setVisible(false);
         }
         if (State.playerMoney >= 1000) {
             console.log('YOU WIN!');
@@ -522,7 +555,6 @@ export default class MainScene extends Phaser.Scene {
             }
         }
         if (State.phase === Constants.Phases.Farm) {
-            // TODO update plant plots
             // Update plant images
             for (const i in State.plants) {
                 const plant = this.plants[i];
@@ -533,11 +565,19 @@ export default class MainScene extends Phaser.Scene {
                 } else {
                     plot.setTexture(Assets.Images.PlotWet);
                 }
-                if (level !== 0) {
+                if (level == -99) {
+                    plant.setVisible(true);
+                    plant.setTexture(Assets.Images['PlantWilted']);
+                } else if (level !== 0) {
                     plant.setVisible(true);
                     plant.setTexture(Assets.Images['Plant' + Math.abs(level)]);
                 } else {
                     plant.setVisible(false);
+                }
+                if (level === State.cardLevels.CardSeed + 2) {
+                    this.plantTweens[i].resume();
+                } else {
+                    this.plantTweens[i].pause();
                 }
             }
 
@@ -547,15 +587,44 @@ export default class MainScene extends Phaser.Scene {
             } else if (State.time - State.lastTick > 100) {
 
                 let newRotation = State.time / Constants.FarmingTime;
+                
+                if (newRotation < 0.25) {
+                    this.background.setTexture(Assets.Images.FarmBackgroundSpring);
+                } else if (newRotation < 0.5) {
+                    this.background.setTexture(Assets.Images.FarmBackgroundSummer);
+                } else if (newRotation < 0.75) {
+                    this.background.setTexture(Assets.Images.FarmBackgroundFall);
+                } else {
+                    this.background.setTexture(Assets.Images.FarmBackgroundWinter);
+                }
+                
                 newRotation = newRotation * Math.PI * 2 * -1; // -1 to rotate counterclockwise
                 this.seasonWheel.setRotation(newRotation);
 
-                const i = Phaser.Math.Between(0, State.plants.length);
-                const level = State.plants[i];
-                if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
-                    if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
-                        State.plants[i] += 1;
+                for (let i = 0; i < State.plants.length; i++) {
+                    const level = State.plants[i];
+                    let cowMultiplier = 1;
+                    if (State.hand.includes(Cards.CardCow)) {
+                        cowMultiplier = [ 2.0, 4.0, 8.0, 16.0 ][State.cardLevels.CardCow];
                     }
+                    if (level > 0 && level <= 4 && Constants.GrowthChance * cowMultiplier > Math.random()) {
+                        if ( (State.hand.includes(Cards.CardPlague))
+                            && (!State.hand.includes(Cards.CardTalisman))
+                            && (Constants.WiltOnGrowthChance > Math.random()) ) {
+                            State.plants[i] = -99;
+                        } else {
+                            if (State.cardLevels.CardSeed + 2 > State.plants[i]) {
+                                State.plants[i] += 1;
+                            }
+                        }
+                    }
+                    if ( (State.hand.includes(Cards.CardDrought))
+                      && (!State.hand.includes(Cards.CardTalisman))
+                      && (level > 0)
+                      && (Constants.DryingChance > Math.random()) ) {
+                        State.plants[i] = -level;
+                    }
+
                 }
                 State.lastTick = State.lastTick + 100;
             }

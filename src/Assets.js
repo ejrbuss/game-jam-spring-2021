@@ -3,7 +3,10 @@ const Assets = {
     Images: {
         FarmBackground: 'Images/FarmBackground.png',
         FarmTitleBackground: 'Images/FarmTitleBackground.png',
-        FarmPlotBackground: 'Images/FarmPlotBackground.png',
+        FarmBackgroundSpring: 'Images/FarmBackgroundSpring.png',
+        FarmBackgroundSummer: 'Images/FarmBackgroundSummer.png',
+        FarmBackgroundFall: 'Images/FarmBackgroundFall.png',
+        FarmBackgroundWinter: 'Images/FarmBackgroundWinter.png',
         MarketBackground: 'Images/MarketBackground.png',
         MoneyBoard: 'Images/MoneyBoard.png',
         Space: 'Images/space.png',
@@ -15,6 +18,8 @@ const Assets = {
         BuyButton: 'Images/BuyButton.png',
         BuyButtonDisabled: 'Images/BuyButtonDisabled.png',
         ContinueButton: 'Images/ContinueButton.png',
+
+        SelectionSquare: 'Images/SelectionSquare.png',
 
         CardSeed: 'Images/CardSeed.png',
         CardCow: 'Images/CardCow.png',
@@ -42,7 +47,7 @@ const Assets = {
         PlotDry: 'Images/PlotDry.png',
         PlotWet: 'Images/PlotWet.png',
 
-        PlantWilted: 'PlantWilted.png',
+        PlantWilted: 'Images/PlantWilted.png',
 
         Plant1: 'Images/Plant1.png',
         Plant2: 'Images/Plant2.png',

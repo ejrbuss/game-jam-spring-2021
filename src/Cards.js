@@ -6,6 +6,7 @@ const Cards = {
             { upgradeCost: 100 },
             { upgradeCost: 200 },
             { upgradeCost: 400 },
+            { upgradeCost: 800 },
         ],
     },
     CardCow: {
@@ -16,6 +17,8 @@ const Cards = {
               buyCost:     25 },
             { upgradeCost: 100,
               buyCost:     50 },
+            { upgradeCost: 200,
+              buyCost:     100 },
         ],
     },
     CardScarecrow: {
@@ -26,16 +29,14 @@ const Cards = {
             buyCost:     25 },
           { upgradeCost: 100,
             buyCost:     50 },
+          { upgradeCost: 200,
+            buyCost:     100 },
         ],
     },
     CardTalisman: {
         levels: [
           { upgradeCost: 25,
             buyCost:     10 },
-          { upgradeCost: 50,
-            buyCost:     25 },
-          { upgradeCost: 100,
-            buyCost:     50 },
         ],
     },
     CardOveralls: {
@@ -46,6 +47,8 @@ const Cards = {
             buyCost:     25 },
           { upgradeCost: 100,
             buyCost:     50 },
+          { upgradeCost: 200,
+            buyCost:     100 },
         ],
     },
     CardSprinkler: {
@@ -56,6 +59,8 @@ const Cards = {
             buyCost:     25 },
           { upgradeCost: 100,
             buyCost:     50 },
+          { upgradeCost: 200,
+            buyCost:     100 },
         ],
     },
     CardTractor: {
@@ -66,6 +71,8 @@ const Cards = {
             buyCost:     25 },
           { upgradeCost: 100,
             buyCost:     50 },
+          { upgradeCost: 200,
+            buyCost:     100 },
         ],
     },
     CardDrought: {
