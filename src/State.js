@@ -19,7 +19,7 @@ const State = {
     plotsWidth: 8,
     plotsHeight: 5,
     // Player's current monies
-    playerMoney: 995,
+    playerMoney: 10,
     // Current card levels
     cardLevels: {
         CardSeed: 0,
