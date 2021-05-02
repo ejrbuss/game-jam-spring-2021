@@ -9,6 +9,12 @@ const Game = new Phaser.Game({
     canvasStyle: 'margin: auto; display: block; width: 1280; height: 720;',
     scene: MainScene,
     antialias: true,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            //debug: true,
+        },
+    },
 });
 
 window.Game = Game;
