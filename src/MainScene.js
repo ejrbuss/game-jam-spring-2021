@@ -111,11 +111,13 @@ export default class MainScene extends Phaser.Scene {
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);
-                if (State.hand.includes(Cards.CardOveralls)) {
-                    const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
-                    for (const plotBox of returns) {
-                        if (State.plants[this.plotBoxes.indexOf(plotBox)] === 0) {
-                            plotBox.setVisible(true);
+                if (State.plants[i] === 0) {
+                    if (State.hand.includes(Cards.CardOveralls)) {
+                        const returns = this.AOEgetThings(State.cardLevels[Cards.CardOveralls.Key], i, this.plotBoxes);
+                        for (const plotBox of returns) {
+                            if (State.plants[this.plotBoxes.indexOf(plotBox)] === 0) {
+                                plotBox.setVisible(true);
+                            }
                         }
                     }
                 }
