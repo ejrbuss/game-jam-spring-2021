@@ -65,7 +65,9 @@ export default class MainScene extends Phaser.Scene {
             }
         });
         background.setDisplaySize(Constants.Width, Constants.Height);
-        const moneyBoard = this.add.image(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
+        const cornGroup = this.physics.add.group();
+        const moneyBoard = this.physics.add.staticSprite(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
+        this.physics.add.collider(cornGroup, moneyBoard, (...args) => {this.handleCornCollision(...args)});
         moneyBoard.setScale(0.3 * U);
         const money = this.add.text(Constants.Width - 150 * U, 16 * U, State.playerMoney, { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
         money.setDisplayOrigin(0, 0);
@@ -77,6 +79,7 @@ export default class MainScene extends Phaser.Scene {
         this.events.addListener(Constants.Events.RefreshMoney, () => {
             money.setText(State.playerMoney);
         });
+        
 
         // Start screen
         const startButton = this.createButton(
@@ -143,8 +146,10 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
-            const plot = this.add.sprite(x * 80 * U + 148 * U, y * 80 * U + 78 * U, Assets.Images.PlotDry);
-            const plotBox = this.add.rectangle(x * 80 * U + 148 * U, y * 80 * U + 78 * U, 78 * U, 78 * U);
+            const xPos = x * 75 * U + 175 * U;
+            const yPos = y * 75 * U + 100 * U;
+            const plot = this.add.sprite(xPos, yPos, Assets.Images.PlotDry);
+            const plotBox = this.add.rectangle(xPos, yPos, 70 * U, 70 * U);
             plotBox.setStrokeStyle(2, 0x121200);
             plotBox.setVisible(false);
             plot.setScale(0.08 * U);
@@ -159,17 +164,24 @@ export default class MainScene extends Phaser.Scene {
                 const level = State.plants[i];
                 // Plant
                 if (level === 0) {
+                    this.sound.play(Assets.Sounds.Sow);
                     State.plants[i] = -1;
                 }
                 // Water
                 if (level < 0) {
+                    this.sound.play(Assets.Sounds.Water);
                     State.plants[i] = -level;
                 }
                 // Harvest
                 if (level === State.cardLevels.CardSeed + 2) {
+                    this.sound.play(Assets.Sounds.HarvestClick);
                     State.plants[i] = 0;
-                    State.playerMoney += 20 * (State.cardLevels.CardSeed + 2);
                     this.events.emit(Constants.Events.RefreshMoney);
+                    for (let x = -1; x < level; x++) {
+                        const xOffset = (Math.random() * 2 - 1) * 100;
+                        const yOffset = (Math.random() * 2 - 1) * 100;
+                        this.createZoomingCorn(cornGroup, xPos + xOffset, yPos + yOffset);
+                    }
                 }
             });
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
@@ -201,6 +213,24 @@ export default class MainScene extends Phaser.Scene {
         }
 
         this.gotoPhase(Constants.Phases.Start);
+    }
+
+    handleCornCollision(sign, corn) {
+        corn.destroy();
+        State.playerMoney += 20;
+        this.events.emit(Constants.Events.RefreshMoney);
+        this.sound.play(Assets.Sounds.HarvestGain, {
+            volume: 1
+        });
+    }
+
+    createZoomingCorn(cornGroup, x, y) {
+        const cornAsset = Assets.Images.Corn;
+        const corn = cornGroup.create(x, y, cornAsset);
+        corn.setScale(0.075);
+        const offset = {x: Constants.Width - x, y: y};
+        console.log(x,y,offset, Constants.Width, Constants.Height);
+        corn.setVelocity(offset.x, -offset.y);
     }
 
     visibleDuringPhase(phase, ...objects) {
@@ -293,6 +323,7 @@ export default class MainScene extends Phaser.Scene {
                   || (State.playerMoney < card.levels[curLevel].buyCost) )  // the user does not have enough money
                 { return; }
                 State.playerMoney -= card.levels[curLevel].buyCost;
+                this.sound.play(Assets.Sounds.Buy);
                 State.hand.push(card);
                 if (State.hand.length === 5) {
                     this.gotoPhase(Constants.Phases.Farm);
