@@ -184,6 +184,23 @@ export default class MainScene extends Phaser.Scene {
         const marketCard = this.add.sprite(x, y, card.Image);
         // marketCard.setRotation(rotation);
         marketCard.setScale(0.15 * U);
+        marketCard.setInteractive();
+        marketCard.on(Phaser.Input.Events.POINTER_OVER, () => {
+            this.add.tween({
+                targets: marketCard,
+                rotation: 0.1,
+                ease: 'bounce',
+                duration: '500',
+            });
+        });
+        marketCard.on(Phaser.Input.Events.POINTER_OUT, () => {
+            this.add.tween({
+                targets: marketCard,
+                rotation: 0,
+                ease: 'bounce',
+                duration: '500',
+            });
+        });
         const levelIndicator = this.add.text(x - 30, y - 55, '');
         levelIndicator.setColor('#000000');
         let upgradeButton;
