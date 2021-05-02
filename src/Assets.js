@@ -14,9 +14,7 @@ const Assets = {
 
         StartButton: 'Images/StartButton.png',
         UpgradeButton: 'Images/UpgradeButton.png',
-        UpgradeButtonDisabled: 'Images/UpgradeButtonDisabled.png',
         BuyButton: 'Images/BuyButton.png',
-        BuyButtonDisabled: 'Images/BuyButtonDisabled.png',
         ContinueButton: 'Images/ContinueButton.png',
         RockButtonBuy: 'Images/RockButtonBuy.png',
         RockButtonUpgrade: 'Images/RockButtonUpgrade.png',
@@ -31,13 +29,6 @@ const Assets = {
         CardOveralls: 'Images/CardOveralls.png',
         CardSprinkler: 'Images/CardSprinkler.png',
         CardTractor: 'Images/CardTractor.png',
-        CardSeedDisabled: 'Images/CardSeedDisabled.png',
-        CardCowDisabled: 'Images/CardCowDisabled.png',
-        CardScarecrowDisabled: 'Images/CardScarecrowDisabled.png',
-        CardTalismanDisabled: 'Images/CardTalismanDisabled.png',
-        CardOverallsDisabled: 'Images/CardOverallsDisabled.png',
-        CardSprinklerDisabled: 'Images/CardSprinklerDisabled.png',
-        CardTractorDisabled: 'Images/CardTractorDisabled.png',
 
         CardDrought: 'Images/CardDrought.png',
         CardPestilence: 'Images/CardPestilence.png',
@@ -62,7 +53,7 @@ const Assets = {
         SeasonWheelArrow: 'Images/SeasonWheelArrow.png',
 
         Corn: 'Images/corn.png',
-        Crow: 'Images/crow.png',
+        Crow: 'Images/Crow.png',
         CrowDead: 'Images/CrowDead.png'
     },
     Sounds: {
