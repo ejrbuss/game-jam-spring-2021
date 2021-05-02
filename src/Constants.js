@@ -6,6 +6,7 @@ const Constants = {
     GrowthChance: 0.01,
     WiltOnGrowthChance: 0.3,
     DryingChance: 0.007,
+    CrowChance: 0.001,
     // Game Events
     Events: {
         ExitPhase: 'ExitPhase',
