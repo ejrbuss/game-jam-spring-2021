@@ -1,3 +1,5 @@
+import Cards from './Cards';
+
 // This is the game's entire mutable state, and its initial value
 const State = {
     // start, market, farm, end
@@ -28,6 +30,7 @@ const State = {
         CardSprinkler: 0,
         CardTractor: 0,
     },
+    cursedCard: null
 };
 
 window.State = State;
