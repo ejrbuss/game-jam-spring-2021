@@ -2,12 +2,14 @@
 const Assets = {
     Images: {
         FarmBackground: 'Images/FarmBackground.png',
+        FarmPlotBackground: 'Images/FarmPlotBackground.png',
         MarketBackground: 'Images/MarketBackground.png',
         MoneyBoard: 'Images/MoneyBoard.png',
 
         StartButton: 'Images/StartButton.png',
         UpgradeButton: 'Images/UpgradeButton.png',
         BuyButton: 'Images/BuyButton.png',
+        ContinueButton: 'Images/ContinueButton.png',
 
         CardSeed: 'Images/CardSeed.png',
         CardCow: 'Images/CardCow.png',
@@ -21,8 +23,15 @@ const Assets = {
         CardPestilence: 'Images/CardPestilence.png',
         CardPlague: 'Images/CardPlague.png',
 
+        Star1: 'Images/Star1.png',
+        Star2: 'Images/Star2.png',
+        Start3: 'Images/Star3.png',
+
         PlotDry: 'Images/PlotDry.png',
         PlotWet: 'Images/PlotWet.png',
+
+        PlantWilted: 'PlantWilted.png',
+
         Plant1: 'Images/Plant1.png',
         Plant2: 'Images/Plant2.png',
         Plant3: 'Images/Plant3.png',

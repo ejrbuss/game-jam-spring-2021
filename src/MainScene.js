@@ -33,12 +33,21 @@ export default class MainScene extends Phaser.Scene {
 
     create() {
         const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            // TODO animate blur
+            switch (State.phase) {
+                case Constants.Phases.Start: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.End: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.Market: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.Farm: background.setTexture(Assets.Images.FarmPlotBackground); break;
+            }
+        });
         background.setDisplaySize(Constants.Width, Constants.Height);
         const cornGroup = this.physics.add.group();
         const moneyBoard = this.physics.add.staticSprite(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
         this.physics.add.collider(cornGroup, moneyBoard, (...args) => {this.handleCornCollision(...args)});
         moneyBoard.setScale(0.3 * U);
-        const money = this.add.text(Constants.Width - 150 * U, 16 * U, "0", { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
+        const money = this.add.text(Constants.Width - 150 * U, 16 * U, State.playerMoney, { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
         money.setDisplayOrigin(0, 0);
         this.events.addListener(Constants.Events.EnterPhase, () => {
             const moneyVisible = State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm;
@@ -78,9 +87,28 @@ export default class MainScene extends Phaser.Scene {
 
         });
         const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
+        const continueButton = this.createButton(Constants.Width - 100 * U, Constants.Height - 50 * U, 0.3 * U, Assets.Images.ContinueButton, () => {
+            this.gotoPhase(Constants.Phases.Farm);
+        });
+        continueButton.on(Phaser.Input.Events.POINTER_OVER, () => {
+            this.add.tween({
+                targets: continueButton,
+                rotation: 0.1,
+                duration: 500,
+                ease: 'bounce',
+            });
+        });
+        continueButton.on(Phaser.Input.Events.POINTER_OUT, () => {
+            this.add.tween({
+                targets: continueButton,
+                rotation: 0,
+                duration: 500,
+                ease: 'bounce',
+            });
+        });
         marketBoard.setDisplaySize(Constants.Width - 60 * U, Constants.Height - 60 * U);
         marketBoard.setRotation(0.05);
-        this.visibleDuringPhase(Constants.Phases.Market, marketBoard);
+        this.visibleDuringPhase(Constants.Phases.Market, marketBoard, continueButton);
 
         this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4, Cards.CardCow);
         this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4, Cards.CardScarecrow);
@@ -102,7 +130,7 @@ export default class MainScene extends Phaser.Scene {
             const plotBox = this.add.rectangle(xPos, yPos, 70 * U, 70 * U);
             plotBox.setStrokeStyle(2, 0x121200);
             plotBox.setVisible(false);
-            plot.setScale(0.075 * U);
+            plot.setScale(0.08 * U);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);                
@@ -139,8 +167,8 @@ export default class MainScene extends Phaser.Scene {
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
             });
             const plant = this.add.sprite(
-                x * 75 * U + 175 * U + Math.random() * 8 * U, 
-                y * 75 * U + 100 * U + Math.random() * 8 * U, 
+                x * 80 * U + 148 * U + Math.random() * 8 * U, 
+                y * 80 * U + 78 * U + Math.random() * 8 * U, 
                 Assets.Images.Plant1,
             );
             plant.setScale(0.075 * U);
@@ -157,6 +185,7 @@ export default class MainScene extends Phaser.Scene {
 
         // Hand Cards
         this.handCards = {};
+        this.handCardsStars = {};
         for (const key in Cards) {
             this.createHandCard(Cards[key]);
         }
@@ -213,9 +242,30 @@ export default class MainScene extends Phaser.Scene {
         // the player cannot afford them
         const marketCard = this.add.sprite(x, y, card.Image);
         // marketCard.setRotation(rotation);
+
         marketCard.setScale(0.15 * U);
-        const levelIndicator = this.add.text(x - 30, y - 55, '');
-        levelIndicator.setColor('#000000');
+        marketCard.setInteractive();
+
+        const star = this.add.sprite(x, y);
+        star.setScale(0.15 * U);
+
+        marketCard.on(Phaser.Input.Events.POINTER_OVER, () => {
+            this.add.tween({
+                targets: [ marketCard, star ],
+                rotation: 0.1,
+                ease: 'bounce',
+                duration: '500',
+            });
+        });
+        marketCard.on(Phaser.Input.Events.POINTER_OUT, () => {
+            this.add.tween({
+                targets: [ marketCard, star ],
+                rotation: 0,
+                ease: 'bounce',
+                duration: '500',
+            });
+        });
+
         let upgradeButton;
         let buyButton;
         if (card === Cards.CardSeed) {
@@ -230,7 +280,7 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton);
+            this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton);
         }
         else
         {
@@ -259,12 +309,10 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            this.visibleDuringPhase(Constants.Phases.Market, marketCard, levelIndicator, upgradeButton, buyButton);
+            this.visibleDuringPhase(Constants.Phases.Market, marketCard, star, upgradeButton, buyButton);
         }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
-            // TODO show the card level in a proper manner
-            levelIndicator.setText(`Level ${curLevel + 1}`);
             
             if (curLevel + 1 == card.levels.length) {
                 upgradeButton.setTint(0xff0000);
@@ -287,6 +335,14 @@ export default class MainScene extends Phaser.Scene {
                     upgradeButton.setTint(0xff0000);
                 }
             }
+
+            switch (curLevel) {
+                case 1: star.setTexture(Assets.Images.Star1); break;
+                case 2: star.setTexture(Assets.Images.Star2); break;
+                case 3: star.setTexture(Assets.Images.Star3); break;
+                default: star.setTexture(undefined); break;
+            }
+
         });
         this.events.addListener(Constants.Events.EnterPhase, () => {
             marketCard.clearTint();
@@ -302,9 +358,11 @@ export default class MainScene extends Phaser.Scene {
         const handCard = this.add.sprite(0, Constants.Height + 25 * U, card.Image);
         handCard.setInteractive();
         handCard.setScale(0.15 * U);
+        const star = this.add.sprite(0, Constants.Height + 25 * U);
+        star.setScale(0.15 * U);
         handCard.on(Phaser.Input.Events.POINTER_OVER, () => {
             this.add.tween({
-                targets: handCard,
+                targets: [ handCard, star ],
                 y: Constants.Height - 100 * U,
                 ease: 'Expo',
                 duration: 500,
@@ -312,25 +370,41 @@ export default class MainScene extends Phaser.Scene {
         });
         handCard.on(Phaser.Input.Events.POINTER_OUT, () => {
             this.add.tween({
-                targets: handCard,
+                targets: [ handCard, star ],
                 y: Constants.Height + 25 * U,
                 ease: 'Expo',
                 duration: 500,
             });
         });
         this.handCards[card.Key] = handCard;
+        this.handCardsStars[card.Key] = star;
+        this.events.addListener(Constants.Events.RefreshMarket, () => {
+            let curLevel = State.cardLevels[card.Key];
+            switch (curLevel) {
+                case 1: star.setTexture(Assets.Images.Star1); break;
+                case 2: star.setTexture(Assets.Images.Star2); break;
+                case 3: star.setTexture(Assets.Images.Star3); break;
+                default: star.setTexture(undefined); break;
+            }
+        });
     }
 
     update(time, delta) {
         for (const object in this.handCards) {
             this.handCards[object].setVisible(false);
         }
+        for (const object in this.handCardStars) {
+            this.handCardStars[object].setVisible(false);
+        }
         if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
             let offset = 75 * U;
             for (const card of State.hand) {
                 const handCard = this.handCards[card.Key];
+                const star = this.handCardsStars[card.Key];
                 handCard.setVisible(true);
                 handCard.setX(offset);
+                star.setVisible(true);
+                star.setX(offset);
                 offset += 150 * U;
             }
         }
