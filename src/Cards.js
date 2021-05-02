@@ -37,12 +37,6 @@ const Cards = {
         levels: [
           { upgradeCost: 25,
             buyCost:     10 },
-          { upgradeCost: 50,
-            buyCost:     25 },
-          { upgradeCost: 100,
-            buyCost:     50 },
-          { upgradeCost: 200,
-            buyCost:     100 },
         ],
     },
     CardOveralls: {

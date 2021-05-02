@@ -605,6 +605,7 @@ export default class MainScene extends Phaser.Scene {
                     }
                     if (level > 0 && level <= 4 && Constants.GrowthChance * cowMultiplier > Math.random()) {
                         if ( (State.hand.includes(Cards.CardPlague))
+                            && (!State.hand.includes(Cards.CardTalisman))
                             && (Constants.WiltOnGrowthChance > Math.random()) ) {
                             State.plants[i] = -99;
                         } else {
@@ -614,6 +615,7 @@ export default class MainScene extends Phaser.Scene {
                         }
                     }
                     if ( (State.hand.includes(Cards.CardDrought))
+                      && (!State.hand.includes(Cards.CardTalisman))
                       && (level > 0)
                       && (Constants.DryingChance > Math.random()) ) {
                         State.plants[i] = -level;
