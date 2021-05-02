@@ -33,6 +33,15 @@ export default class MainScene extends Phaser.Scene {
 
     create() {
         const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            // TODO animate blur
+            switch (State.phase) {
+                case Constants.Phases.Start: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.End: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.Market: background.setTexture(Assets.Images.FarmBackground); break;
+                case Constants.Phases.Farm: background.setTexture(Assets.Images.FarmPlotBackground); break;
+            }
+        });
         background.setDisplaySize(Constants.Width, Constants.Height);
         const moneyBoard = this.add.image(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
         moneyBoard.setScale(0.3 * U);
@@ -112,11 +121,11 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
-            const plot = this.add.sprite(x * 75 * U + 175 * U, y * 75 * U + 100 * U, Assets.Images.PlotDry);
-            const plotBox = this.add.rectangle(x * 75 * U + 175 * U, y * 75 * U + 100 * U, 70 * U, 70 * U);
+            const plot = this.add.sprite(x * 80 * U + 148 * U, y * 80 * U + 78 * U, Assets.Images.PlotDry);
+            const plotBox = this.add.rectangle(x * 80 * U + 148 * U, y * 80 * U + 78 * U, 78 * U, 78 * U);
             plotBox.setStrokeStyle(2, 0x121200);
             plotBox.setVisible(false);
-            plot.setScale(0.075 * U);
+            plot.setScale(0.08 * U);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);                
@@ -146,8 +155,8 @@ export default class MainScene extends Phaser.Scene {
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
             });
             const plant = this.add.sprite(
-                x * 75 * U + 175 * U + Math.random() * 8 * U, 
-                y * 75 * U + 100 * U + Math.random() * 8 * U, 
+                x * 80 * U + 148 * U + Math.random() * 8 * U, 
+                y * 80 * U + 78 * U + Math.random() * 8 * U, 
                 Assets.Images.Plant1,
             );
             plant.setScale(0.075 * U);

@@ -6,7 +6,7 @@ const Game = new Phaser.Game({
     type: Phaser.AUTO,
     width: Constants.Width,
     height: Constants.Height,
-    canvasStyle: 'margin: auto; display: block; width: 1280; height: 720;',
+    canvasStyle: 'margin: auto; display: block; width: 1280; height: 720; border-radius: 30px;',
     scene: MainScene,
     antialias: true,
 });

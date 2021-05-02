@@ -2,6 +2,7 @@
 const Assets = {
     Images: {
         FarmBackground: 'Images/FarmBackground.png',
+        FarmPlotBackground: 'Images/FarmPlotBackground.png',
         MarketBackground: 'Images/MarketBackground.png',
         MoneyBoard: 'Images/MoneyBoard.png',
 
@@ -28,6 +29,9 @@ const Assets = {
 
         PlotDry: 'Images/PlotDry.png',
         PlotWet: 'Images/PlotWet.png',
+
+        PlantWilted: 'PlantWilted.png',
+
         Plant1: 'Images/Plant1.png',
         Plant2: 'Images/Plant2.png',
         Plant3: 'Images/Plant3.png',
