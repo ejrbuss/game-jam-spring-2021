@@ -33,7 +33,7 @@ export default class CreditsScene extends Phaser.Scene {
         superCorn.setOrigin(0.5);
 
         let t1 = this.add.text(Constants.Width/2, Constants.Height/2,'Congratulations!').setFontSize(50).setFontStyle('bold').setAlpha(0).setOrigin(0.5);
-        let t2 = this.add.text(Constants.Width/2, Constants.Height/2 + 50, 'You sucessfully met your $1000 goal and funded your expidition to space in...' ).setFontSize(30).setFontStyle('bold').setAlpha(0).setOrigin(0.5);
+        let t2 = this.add.text(Constants.Width/2, Constants.Height/2 + 50, 'You sucessfully met your $1000 goal and funded your expedition to space in...' ).setFontSize(30).setFontStyle('bold').setAlpha(0).setOrigin(0.5);
         let t3 = this.add.text(Constants.Width/2, Constants.Height/2 + 50*2, '... a ...').setFontSize(30).setFontStyle('bold').setAlpha(0).setOrigin(0.5);
         let t4 = this.add.text(Constants.Width/2, Constants.Height/2 + 50*3, '... GIANT ...').setFontSize(30).setFontStyle('bold').setAlpha(0).setOrigin(0.5);
         let t5 = this.add.text(Constants.Width/2, Constants.Height/2 + 50*4, 'CORN!').setFontSize(50).setFontStyle('bold').setAlpha(0).setOrigin(0.5);
