@@ -505,6 +505,10 @@ export default class MainScene extends Phaser.Scene {
         for (const object in this.handCardStars) {
             this.handCardStars[object].setVisible(false);
         }
+        if (State.playerMoney >= 1000) {
+            console.log('YOU WIN!');
+            this.scene.start('CreditsScene');
+        }
         if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
             let offset = 75 * U;
             for (const card of State.hand) {
