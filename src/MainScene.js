@@ -343,7 +343,7 @@ export default class MainScene extends Phaser.Scene {
         if (card === Cards.CardSeed) {
             upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
-                if ( (curLevel + 1 == card.levels.length)                       // the card is max level
+                if ( (curLevel == card.levels.length)                           // the card is max level
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
                 State.playerMoney -= card.levels[curLevel].upgradeCost;
@@ -358,7 +358,7 @@ export default class MainScene extends Phaser.Scene {
         {
             upgradeButton = this.createButton(x - 28 * U, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
-                if ( (curLevel + 1 == card.levels.length)                       // the card is max level
+                if ( (curLevel == card.levels.length)                           // the card is max level
                   || (State.hand.includes(card))                                // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
@@ -367,7 +367,7 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            buyButton = buyButton = this.createButton(x + 40 * U, y + 100 * U, 0.15 * U, Assets.Images.BuyButton, () => {
+            buyButton = this.createButton(x + 40 * U, y + 100 * U, 0.15 * U, Assets.Images.BuyButton, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (State.hand.includes(card))                            // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].buyCost) )  // the user does not have enough money
@@ -398,7 +398,7 @@ export default class MainScene extends Phaser.Scene {
             marketCard.clearTint();
             upgradeButton.clearTint();
             if (buyButton) buyButton.clearTint();
-            if (curLevel + 1 == card.levels.length) {
+            if (curLevel == card.levels.length) {
                 upgradeButton.setTint(0xff0000);
             }
             if (card === State.cursedCard) {
@@ -411,8 +411,7 @@ export default class MainScene extends Phaser.Scene {
                 marketCard.setTint(0xff0000);
                 upgradeButton.setTint(0xff0000);
                 if (buyButton) buyButton.setTint(0xff0000);
-            }
-            else {
+            } else {
                 if (State.hand.length >= 4) {
                     if (card === State.cursedCard) {
                         marketCard.setTint(0xff0088);
@@ -420,12 +419,14 @@ export default class MainScene extends Phaser.Scene {
                         if (buyButton) buyButton.setTint(0xff0000);
                     }
                 }
-                if (State.playerMoney < card.levels[curLevel].buyCost) {
-                    if (buyButton) buyButton.setTint(0xff0000);
-                }
-                if ( (State.playerMoney < card.levels[curLevel].upgradeCost)
-                  || (curLevel + 1 == card.levels.length) ) {
-                    upgradeButton.setTint(0xff0000);
+                if (curLevel < card.levels.length) {
+                    if (State.playerMoney < card.levels[curLevel].buyCost) {
+                        if (buyButton) buyButton.setTint(0xff0000);
+                    }
+                    if ( (State.playerMoney < card.levels[curLevel].upgradeCost)
+                    || (curLevel == card.levels.length) ) {
+                        upgradeButton.setTint(0xff0000);
+                    }
                 }
             }
 

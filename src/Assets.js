@@ -25,7 +25,7 @@ const Assets = {
 
         Star1: 'Images/Star1.png',
         Star2: 'Images/Star2.png',
-        Start3: 'Images/Star3.png',
+        Star3: 'Images/Star3.png',
 
         PlotDry: 'Images/PlotDry.png',
         PlotWet: 'Images/PlotWet.png',
