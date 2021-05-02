@@ -241,7 +241,6 @@ export default class MainScene extends Phaser.Scene {
         const corn = cornGroup.create(x, y, cornAsset);
         corn.setScale(0.075);
         const offset = {x: Constants.Width - x, y: y};
-        console.log(x,y,offset, Constants.Width, Constants.Height);
         corn.setVelocity(offset.x, -offset.y);
     }
 
