@@ -2,12 +2,13 @@ import Phaser from 'phaser';
 import Assets from './Assets';
 import Cards from './Cards';
 import Constants from './Constants';
-import State from './State'; 
+import State from './State';
 
 export default class MainScene extends Phaser.Scene {
 
-    super() {
-        constructor('MainScene');
+    constructor() {
+        super('MainScene');
+        window.MainScene = this;
     }
 
     gotoPhase(phase) {
@@ -74,22 +75,40 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
-            const plot = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.Plot);
+            const plot = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.PlotDry);
             plot.setScale(0.075);
             plot.setInteractive();
-            plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
-                // TODO manage plot state properly
-                console.log('clicked plot');
-                State.plants[i] = (State.plants[i] + 1) % 6;
-            
-            });
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
-                plot.setTint(0x00ff00);
+
             });
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
-                plot.clearTint();
+
             });
-            const plant = this.add.sprite(x * 75 + 175, y * 75 + 100, Assets.Images.Plant1);
+            plot.on(Phaser.Input.Events.POINTER_DOWN, () => {
+                const level = State.plants[i];
+                // Plant
+                if (level === 0) {
+                    State.plants[i] = -1;
+                }
+                // Water
+                if (level < 0) {
+                    State.plants[i] = -level;
+                }
+                // Harvest
+                if (level === 5) {
+                    State.plants[i] = 0;
+                    State.playerCash += 100;
+                }
+            });
+            plot.on(Phaser.Input.Events.POINTER_OVER, () => {
+            });
+            plot.on(Phaser.Input.Events.POINTER_OUT, () => {
+            });
+            const plant = this.add.sprite(
+                x * 75 + 175 + Math.random() * 10, 
+                y * 70 + 100 + Math.random() * 10, 
+                Assets.Images.Plant1,
+            );
             plant.setScale(0.075);
             this.plants.push(plant);
             this.plots.push(plot);
@@ -99,6 +118,7 @@ export default class MainScene extends Phaser.Scene {
         this.events.addListener(Constants.Events.EnterPhase, () => {
             if (State.phase !== Constants.Phases.Farm) { return; }
             State.time = 0;
+            State.lastTick = 0;
         })
 
         // Hand Cards
@@ -138,7 +158,6 @@ export default class MainScene extends Phaser.Scene {
         });
         return button;
     }
-
 
     createMarketCard(x, y, card) {
         // TODO upgrade and buy buttons should be in a visibly disabled state if 
@@ -209,6 +228,11 @@ export default class MainScene extends Phaser.Scene {
                 const plant = this.plants[i];
                 const plot = this.plots[i];
                 const level = State.plants[i];
+                if (level <= 0) {
+                    plot.setTexture(Assets.Images.PlotDry);
+                } else {
+                    plot.setTexture(Assets.Images.PlotWet);
+                }
                 if (level !== 0) {
                     plant.setVisible(true);
                     plant.setTexture(Assets.Images['Plant' + Math.abs(level)]);
@@ -220,6 +244,12 @@ export default class MainScene extends Phaser.Scene {
             State.time += delta;
             if (State.time > Constants.FarmingTime) {
                 this.gotoPhase(Constants.Phases.Market);
+            } else if (State.time - State.lastTick > 100) {
+                const i = Phaser.Math.Between(0, State.plants.length);
+                const level = State.plants[i];
+                if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
+                    State.plants[i] += 1;
+                }
             }
         }
 

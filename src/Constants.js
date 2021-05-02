@@ -1,7 +1,8 @@
 const Constants = {
     Width: 1024,
     Height: 576,
-    FarmingTime: 100 * 30* 50,
+    FarmingTime: 1000 * 30,
+    GrowthChance: 0.1,
     // Game Events
     Events: {
         ExitPhase: 'ExitPhase',

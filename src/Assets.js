@@ -28,7 +28,8 @@ const Assets = {
         CardPestilence: 'Images/CardPestilence.png',
         CardPlague: 'Images/CardPlague.png',
 
-        Plot: 'Images/Plot.png',
+        PlotDry: 'Images/PlotDry.png',
+        PlotWet: 'Images/PlotWet.png',
         Plant1: 'Images/Plant1.png',
         Plant2: 'Images/Plant2.png',
         Plant3: 'Images/Plant3.png',

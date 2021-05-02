@@ -5,6 +5,7 @@ const State = {
     // Player's current hand
     hand: [],
     time: 0,
+    lastTick: 0,
     // Farm plots (magnitude growth phase, neagtive needs water)
     plants: [
         0, 0, 0, 0, 0, 0, 0, 0,
