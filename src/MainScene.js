@@ -614,6 +614,12 @@ export default class MainScene extends Phaser.Scene {
                             }
                         }
                     }
+                    if ( (State.hand.includes(Cards.CardDrought))
+                      && (level !== State.cardLevels.CardSeed + 2)
+                      && (Math.random() > Constants.DryingChance) ) {
+                        State.plants[i] = -level;
+                    }
+
                 }
                 State.lastTick = State.lastTick + 100;
             }
