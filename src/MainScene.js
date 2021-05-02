@@ -243,6 +243,7 @@ export default class MainScene extends Phaser.Scene {
         this.createMarketCard(Constants.Width / 4 + 575 * U, Constants.Height / 4 + 125 * U, Cards.CardSeed);
         
         for (const target of this.marketAnimated) {
+            target.originalY = target.y;
             target.setY(target.y - Constants.Height);
         }
         this.events.addListener(Constants.Events.EnterPhase, () => {
@@ -255,7 +256,7 @@ export default class MainScene extends Phaser.Scene {
             for (const target of this.marketAnimated) {
                 this.add.tween({
                     targets: target,
-                    y: target.y + Constants.Height,
+                    y: target.originalY,
                     duration: 1000,
                     ease: 'Bounce',
                 });
@@ -267,7 +268,7 @@ export default class MainScene extends Phaser.Scene {
             for (const target of this.marketAnimated) {
                 this.add.tween({
                     targets: target,
-                    y: target.y - Constants.Height,
+                    y: target.originalY - Constants.Height,
                     duration: 1000,
                     ease: 'Bounce',
                 });
