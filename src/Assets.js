@@ -3,6 +3,7 @@ const Assets = {
     Images: {
         FarmBackground: 'Images/FarmBackground.png',
         MarketBackground: 'Images/MarketBackground.png',
+        MoneyBoard: 'Images/MoneyBoard.png',
 
         StartButton: 'Images/StartButton.png',
         StartButtonHover: 'Images/StartButtonHover.png',

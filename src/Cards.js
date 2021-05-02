@@ -7,7 +7,6 @@ const Cards = {
             { cost: 100 },
             { cost: 500 },
         ],
-        level: 0,
     },
     CardCow: {
         levels: [
@@ -15,7 +14,6 @@ const Cards = {
             { cost: 100 },
             { cost: 500 },
         ],
-        level: 0,
     },
     CardScarecrow: {
         levels: [

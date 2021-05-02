@@ -31,6 +31,18 @@ export default class MainScene extends Phaser.Scene {
 
     create() {
         const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
+        const moneyBoard = this.add.image(Constants.Width - 100, 30, Assets.Images.MoneyBoard);
+        moneyBoard.setScale(0.3);
+        const money = this.add.text(Constants.Width - 150, 16, "0", { fontFamily: 'Nunito-Light', fontSize: 24, align: 'right', color: '#B69E7C' });
+        money.setDisplayOrigin(0, 0);
+        this.events.addListener(Constants.Events.EnterPhase, () => {
+            const moneyVisible = State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm;
+            moneyBoard.setVisible(moneyVisible);
+            money.setVisible(moneyVisible);
+        });
+        this.events.addListener(Constants.Events.RefreshMoney, () => {
+            money.setText(State.playerMoney);
+        });
 
         // Start screen
         const startButton = this.createButton(
@@ -100,7 +112,8 @@ export default class MainScene extends Phaser.Scene {
                 // Harvest
                 if (level === 5) {
                     State.plants[i] = 0;
-                    State.playerCash += 100;
+                    State.playerMoney += 100;
+                    this.events.emit(Constants.Events.RefreshMoney);
                 }
             });
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {

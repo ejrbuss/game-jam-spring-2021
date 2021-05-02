@@ -8,6 +8,7 @@ const Constants = {
         ExitPhase: 'ExitPhase',
         EnterPhase: 'EnterPhase',
         RefreshMarket: 'RefreshMarket',
+        RefreshMoney: 'RefreshMoney',
     },
     // Game Phases
     Phases: {
