@@ -215,7 +215,10 @@ export default class MainScene extends Phaser.Scene {
             if (State.phase !== Constants.Phases.Farm) { return; }
             State.time = 0;
             State.lastTick = 0;
-        })
+        });
+
+        this.createSeasonWheel();
+        this.visibleDuringPhase(Constants.Phases.Farm);
 
         // Hand Cards
         this.handCards = {};
@@ -251,6 +254,14 @@ export default class MainScene extends Phaser.Scene {
                 object.setVisible(State.phase === phase);
             }
         });
+    }
+
+    createSeasonWheel() {
+        this.seasonWheel = this.add.sprite(Constants.Width - 100 * U, 100 * U, Assets.Images.SeasonWheel);
+        const seasonArrow = this.add.sprite(Constants.Width - 99 * U, 81 * U, Assets.Images.SeasonWheelArrow);
+        this.seasonWheel.setScale(0.20 * U);
+        seasonArrow.setScale(0.20 * U);
+        this.visibleDuringPhase(Constants.Phases.Farm, this.seasonWheel, seasonArrow);
     }
 
     createButton(x, y, scale, buttonAsset, onClick) {
@@ -487,6 +498,11 @@ export default class MainScene extends Phaser.Scene {
             if (State.time > Constants.FarmingTime) {
                 this.gotoPhase(Constants.Phases.Market);
             } else if (State.time - State.lastTick > 100) {
+
+                let newRotation = State.time / Constants.FarmingTime;
+                newRotation = newRotation * Math.PI * 2 * -1; // -1 to rotate counterclockwise
+                this.seasonWheel.setRotation(newRotation);
+
                 const i = Phaser.Math.Between(0, State.plants.length);
                 const level = State.plants[i];
                 if (level > 0 && level <= 4 && Math.random() > Constants.GrowthChance) {
