@@ -244,7 +244,6 @@ export default class MainScene extends Phaser.Scene {
         const corn = cornGroup.create(x, y, cornAsset);
         corn.setScale(0.075);
         const offset = {x: Constants.Width - x, y: y};
-        console.log(x,y,offset, Constants.Width, Constants.Height);
         corn.setVelocity(offset.x, -offset.y);
     }
 
@@ -315,7 +314,6 @@ export default class MainScene extends Phaser.Scene {
             upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (curLevel + 1 == card.levels.length)                       // the card is max level
-                  || (State.hand.includes(card))                                // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].upgradeCost) )  // the user does not have enough money
                 { return; }
                 State.playerMoney -= card.levels[curLevel].upgradeCost;
@@ -364,7 +362,6 @@ export default class MainScene extends Phaser.Scene {
         }
         this.events.addListener(Constants.Events.RefreshMarket, () => {
             let curLevel = State.cardLevels[card.Key];
-            // TODO show the card level in a proper manner
             // clear tints and then we're gonna reapply them
             marketCard.clearTint();
             upgradeButton.clearTint();
@@ -386,7 +383,6 @@ export default class MainScene extends Phaser.Scene {
             else {
                 if (State.hand.length >= 4) {
                     if (card === State.cursedCard) {
-                        console.log('here2, card is ', card);
                         marketCard.setTint(0xff0088);
                         upgradeButton.setTint(0xff0000);
                         if (buyButton) buyButton.setTint(0xff0000);
