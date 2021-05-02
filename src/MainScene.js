@@ -4,6 +4,8 @@ import Cards from './Cards';
 import Constants from './Constants';
 import State from './State';
 
+const U = Constants.Unit;
+
 export default class MainScene extends Phaser.Scene {
 
     constructor() {
@@ -32,9 +34,9 @@ export default class MainScene extends Phaser.Scene {
     create() {
         const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
         background.setDisplaySize(Constants.Width, Constants.Height);
-        const moneyBoard = this.add.image(Constants.Width - 100 * Constants.Unit, 30 * Constants.Unit, Assets.Images.MoneyBoard);
-        moneyBoard.setScale(0.3 * Constants.Unit);
-        const money = this.add.text(Constants.Width - 150 * Constants.Unit, 16 * Constants.Unit, "0", { fontFamily: 'Nunito-Light', fontSize: 24 * Constants.Unit, align: 'right', color: '#B69E7C' });
+        const moneyBoard = this.add.image(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
+        moneyBoard.setScale(0.15 * U);
+        const money = this.add.text(Constants.Width - 150 * U, 16 * U, "0", { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
         money.setDisplayOrigin(0, 0);
         this.events.addListener(Constants.Events.EnterPhase, () => {
             const moneyVisible = State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm;
@@ -49,7 +51,7 @@ export default class MainScene extends Phaser.Scene {
         const startButton = this.createButton(
             Constants.Width / 2, 
             Constants.Height / 2,
-            2,
+            1 * U,
             Assets.Images.StartButton, 
             () => { 
                 this.gotoPhase(Constants.Phases.Market) 
@@ -73,17 +75,17 @@ export default class MainScene extends Phaser.Scene {
 
         });
         const marketBoard = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.MarketBackground);
-        marketBoard.setDisplaySize(Constants.Width - 60 * Constants.Unit, Constants.Height - 60 * Constants.Unit);
+        marketBoard.setDisplaySize(Constants.Width - 60 * U, Constants.Height - 60 * U);
         marketBoard.setRotation(0.05);
         this.visibleDuringPhase(Constants.Phases.Market, marketBoard);
 
-        this.createMarketCard(Constants.Width / 4 - 75 * Constants.Unit, Constants.Height / 4, Cards.CardCow);
-        this.createMarketCard(Constants.Width / 4 + 125 * Constants.Unit, Constants.Height / 4, Cards.CardScarecrow);
-        this.createMarketCard(Constants.Width / 4 + 325 * Constants.Unit, Constants.Height / 4, Cards.CardTalisman);
-        this.createMarketCard(Constants.Width / 4 - 75 * Constants.Unit, Constants.Height / 4 + 225 * Constants.Unit, Cards.CardOveralls);
-        this.createMarketCard(Constants.Width / 4 + 125 * Constants.Unit, Constants.Height / 4 + 225 * Constants.Unit, Cards.CardSprinkler);
-        this.createMarketCard(Constants.Width / 4 + 325 * Constants.Unit, Constants.Height / 4 + 225 * Constants.Unit, Cards.CardTractor);
-        this.createMarketCard(Constants.Width / 4 + 575 * Constants.Unit, Constants.Height / 4 + 125 * Constants.Unit, Cards.CardSeed);
+        this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4, Cards.CardCow);
+        this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4, Cards.CardScarecrow);
+        this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4, Cards.CardTalisman);
+        this.createMarketCard(Constants.Width / 4 - 75 * U, Constants.Height / 4 + 225 * U, Cards.CardOveralls);
+        this.createMarketCard(Constants.Width / 4 + 125 * U, Constants.Height / 4 + 225 * U, Cards.CardSprinkler);
+        this.createMarketCard(Constants.Width / 4 + 325 * U, Constants.Height / 4 + 225 * U, Cards.CardTractor);
+        this.createMarketCard(Constants.Width / 4 + 575 * U, Constants.Height / 4 + 125 * U, Cards.CardSeed);
 
         // Farm plots
         this.plants= [];
@@ -91,11 +93,11 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < State.plants.length; i++) {
             const x = i % State.plotsWidth;
             const y = Math.floor(i / State.plotsWidth);
-            const plot = this.add.sprite(x * 75 * Constants.Unit + 175 * Constants.Unit, y * 75 * Constants.Unit + 100 * Constants.Unit, Assets.Images.PlotDry);
-            const plotBox = this.add.rectangle(x * 75 * Constants.Unit + 175 * Constants.Unit, y * 75 * Constants.Unit + 100 * Constants.Unit, 70 * Constants.Unit, 70 * Constants.Unit);
+            const plot = this.add.sprite(x * 75 * U + 175 * U, y * 75 * U + 100 * U, Assets.Images.PlotDry);
+            const plotBox = this.add.rectangle(x * 75 * U + 175 * U, y * 75 * U + 100 * U, 70 * U, 70 * U);
             plotBox.setStrokeStyle(2, 0x121200);
             plotBox.setVisible(false);
-            plot.setScale(0.075 * Constants.Unit);
+            plot.setScale(0.075 * U);
             plot.setInteractive();
             plot.on(Phaser.Input.Events.POINTER_OVER, () => {
                 plotBox.setVisible(true);                
@@ -125,11 +127,11 @@ export default class MainScene extends Phaser.Scene {
             plot.on(Phaser.Input.Events.POINTER_OUT, () => {
             });
             const plant = this.add.sprite(
-                x * 75 * Constants.Unit + 175 * Constants.Unit + Math.random() * 8 * Constants.Unit, 
-                y * 75 * Constants.Unit + 100 * Constants.Unit + Math.random() * 8 * Constants.Unit, 
+                x * 75 * U + 175 * U + Math.random() * 8 * U, 
+                y * 75 * U + 100 * U + Math.random() * 8 * U, 
                 Assets.Images.Plant1,
             );
-            plant.setScale(0.075 * Constants.Unit);
+            plant.setScale(0.075 * U);
             this.plants.push(plant);
             this.plots.push(plot);
         }
@@ -181,13 +183,13 @@ export default class MainScene extends Phaser.Scene {
         // the player cannot afford them
         const marketCard = this.add.sprite(x, y, card.Image);
         // marketCard.setRotation(rotation);
-        marketCard.setScale(0.3);
+        marketCard.setScale(0.15 * U);
         const levelIndicator = this.add.text(x - 30, y - 55, '');
         levelIndicator.setColor('#000000');
         let upgradeButton;
         let buyButton;
         if (card === Cards.CardSeed) {
-            upgradeButton = this.createButton(x, y + 100 * Constants.Unit, 0.3, Assets.Images.UpgradeButton, () => {
+            upgradeButton = this.createButton(x, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (curLevel + 1 == card.levels.length)                       // the card is max level
                   || (State.hand.includes(card))                                // the card is already in hand
@@ -202,7 +204,7 @@ export default class MainScene extends Phaser.Scene {
         }
         else
         {
-            upgradeButton = this.createButton(x - 28 * Constants.Unit, y + 100 * Constants.Unit, 0.3, Assets.Images.UpgradeButton, () => {
+            upgradeButton = this.createButton(x - 28 * U, y + 100 * U, 0.15 * U, Assets.Images.UpgradeButton, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (curLevel + 1 == card.levels.length)                       // the card is max level
                   || (State.hand.includes(card))                                // the card is already in hand
@@ -213,7 +215,7 @@ export default class MainScene extends Phaser.Scene {
                 this.events.emit(Constants.Events.RefreshMoney);
                 this.events.emit(Constants.Events.RefreshMarket);
             });
-            buyButton = buyButton = this.createButton(x + 40 * Constants.Unit, y + 100 * Constants.Unit, 0.3, Assets.Images.BuyButton, () => {
+            buyButton = buyButton = this.createButton(x + 40 * U, y + 100 * U, 0.15 * U, Assets.Images.BuyButton, () => {
                 let curLevel = State.cardLevels[card.Key];
                 if ( (State.hand.includes(card))                            // the card is already in hand
                   || (State.playerMoney < card.levels[curLevel].buyCost) )  // the user does not have enough money
@@ -266,13 +268,13 @@ export default class MainScene extends Phaser.Scene {
     }
 
     createHandCard(card) {
-        const handCard = this.add.sprite(0, Constants.Height + 25 * Constants.Unit, card.Image);
+        const handCard = this.add.sprite(0, Constants.Height + 25 * U, card.Image);
         handCard.setInteractive();
-        handCard.setScale(0.3);
+        handCard.setScale(0.15 * U);
         handCard.on(Phaser.Input.Events.POINTER_OVER, () => {
             this.add.tween({
                 targets: handCard,
-                y: Constants.Height - 100 * Constants.Unit,
+                y: Constants.Height - 100 * U,
                 ease: 'Expo',
                 duration: 500,
             });
@@ -280,7 +282,7 @@ export default class MainScene extends Phaser.Scene {
         handCard.on(Phaser.Input.Events.POINTER_OUT, () => {
             this.add.tween({
                 targets: handCard,
-                y: Constants.Height + 25 * Constants.Unit,
+                y: Constants.Height + 25 * U,
                 ease: 'Expo',
                 duration: 500,
             });
@@ -293,12 +295,12 @@ export default class MainScene extends Phaser.Scene {
             this.handCards[object].setVisible(false);
         }
         if (State.phase === Constants.Phases.Market || State.phase === Constants.Phases.Farm) {
-            let offset = 75 * Constants.Unit;
+            let offset = 75 * U;
             for (const card of State.hand) {
                 const handCard = this.handCards[card.Key];
                 handCard.setVisible(true);
                 handCard.setX(offset);
-                offset += 150 * Constants.Unit;
+                offset += 150 * U;
             }
         }
         if (State.phase === Constants.Phases.Farm) {
