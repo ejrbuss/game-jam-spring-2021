@@ -35,7 +35,7 @@ export default class MainScene extends Phaser.Scene {
         const background = this.add.image(Constants.Width / 2, Constants.Height / 2, Assets.Images.FarmBackground);
         background.setDisplaySize(Constants.Width, Constants.Height);
         const moneyBoard = this.add.image(Constants.Width - 100 * U, 30 * U, Assets.Images.MoneyBoard);
-        moneyBoard.setScale(0.15 * U);
+        moneyBoard.setScale(0.3 * U);
         const money = this.add.text(Constants.Width - 150 * U, 16 * U, "0", { fontFamily: 'Nunito-Light', fontSize: 24 * U, align: 'right', color: '#B69E7C' });
         money.setDisplayOrigin(0, 0);
         this.events.addListener(Constants.Events.EnterPhase, () => {
